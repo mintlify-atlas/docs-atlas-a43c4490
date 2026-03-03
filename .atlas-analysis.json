@@ -1,0 +1,85 @@
+{
+  "projectType": "frontend",
+  "projectName": "OI Resume App",
+  "projectDescription": "A SwiftUI iOS application showcasing professional skills and experiences with interactive collapsible sections.",
+  "theme": "almond",
+  "primaryColor": "#007AFF",
+  "lightColor": "#5AC8FA",
+  "darkColor": "#0A84FF",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Architecture",
+            "pages": [
+              "architecture/overview",
+              "architecture/data-models",
+              "architecture/views",
+              "architecture/app-state"
+            ]
+          },
+          {
+            "group": "Components",
+            "pages": [
+              "components/portfolio-view",
+              "components/header-view",
+              "components/skills-view",
+              "components/experience-view"
+            ]
+          },
+          {
+            "group": "Customization",
+            "pages": [
+              "customization/fonts",
+              "customization/themes",
+              "customization/content"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Testing",
+        "groups": [
+          {
+            "group": "UI Testing",
+            "pages": [
+              "testing/overview",
+              "testing/page-object-model",
+              "testing/test-cases",
+              "testing/running-tests"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "SwiftUI-based portfolio/resume display",
+    "Interactive collapsible sections with animations",
+    "Custom data models for skills and experiences",
+    "Dark mode and light mode support",
+    "XCUITest UI testing with Page Object Model",
+    "Custom font management (Montserrat)"
+  ],
+  "publicApiSurface": [
+    "Portfolio struct",
+    "Skill struct",
+    "Experience struct",
+    "AppModel class",
+    "PortfolioView",
+    "SkillsView",
+    "ExperiencesView",
+    "HeaderView",
+    "Montserrat font manager"
+  ]
+}
