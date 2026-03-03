@@ -1,0 +1,238 @@
+---
+title: Experience view
+description: Interactive collapsible list displaying work experience with smooth expand/collapse animations
+---
+
+## Overview
+
+The `ExperiencesView` displays a vertical list of work experience entries with an interactive collapse/expand feature. Users can toggle the visibility of experience details using a chevron button, similar to the SkillsView component.
+
+<Note>
+  This component uses SwiftUI's state management and animation system to create smooth transitions when showing or hiding experience entries.
+</Note>
+
+## Source code
+
+```swift
+import SwiftUI
+
+struct ExperiencesView: View {
+    
+    // Variables
+    var experience: [Experience]
+    
+    @State var showExperiences = true
+    
+    // Views
+    var body: some View {
+        VStack(alignment: .leading, spacing : 24) {
+            HStack(spacing: 16) {
+                Text("Experience")
+                    .font(Montserrat.bold.font(size: 21))
+                    .opacity(0.9)
+                
+                Button {
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        showExperiences.toggle()
+                    }
+                } label: {
+                    Image(systemName: "chevron.up")
+                        .font(.system(size: 18, weight: .medium))
+                        .rotationEffect(self.showExperiences ? .zero : .degrees(180))
+                }.buttonStyle(PlainButtonStyle())
+            }.padding(.bottom, 14)
+            
+            if(showExperiences) {
+                ForEach(experience) {experience in
+                    ExperienceView(experience: experience)
+                }
+            }
+        }
+    }
+}
+```
+
+## Properties
+
+<ParamField path="experience" type="[Experience]" required>
+  Array of Experience objects to display. Each experience entry is rendered as an individual ExperienceView component in chronological order.
+</ParamField>
+
+<ParamField path="showExperiences" type="@State Bool" default="true">
+  State variable controlling the visibility of the experience list. Initialized to `true`, displaying experience entries by default.
+</ParamField>
+
+## Interactive features
+
+### Collapsible animation
+
+The view implements the same smooth animation pattern as SkillsView:
+
+```swift
+Button {
+    withAnimation(.easeInOut(duration: 0.4)) {
+        showExperiences.toggle()
+    }
+} label: {
+    Image(systemName: "chevron.up")
+        .font(.system(size: 18, weight: .medium))
+        .rotationEffect(self.showExperiences ? .zero : .degrees(180))
+}.buttonStyle(PlainButtonStyle())
+```
+
+<ParamField path="animation" type="easeInOut">
+  - **Duration**: 0.4 seconds
+  - **Type**: Ease in/out for natural motion
+  - **Consistency**: Matches SkillsView animation for cohesive UX
+</ParamField>
+
+### Chevron indicator
+
+<ParamField path="chevron.up" type="SF Symbol">
+  - **Size**: 18pt with medium weight
+  - **Expanded state**: Points up (0 degrees)
+  - **Collapsed state**: Points down (180 degrees rotation)
+  - **Purpose**: Visual indicator of collapsible state
+</ParamField>
+
+<Tip>
+  The chevron rotation provides consistent interaction feedback across both the Skills and Experience sections, creating a unified user experience.
+</Tip>
+
+## Layout structure
+
+### Container layout
+
+```swift
+VStack(alignment: .leading, spacing : 24) {
+    // Header and content
+}
+```
+
+<ParamField path="alignment" type=".leading">
+  Left-aligns all child views for consistent text flow.
+</ParamField>
+
+<ParamField path="spacing" type="CGFloat" default="24">
+  24pt vertical spacing between experience entries, creating clear visual separation.
+</ParamField>
+
+### Header section
+
+```swift
+HStack(spacing: 16) {
+    Text("Experience")
+        .font(Montserrat.bold.font(size: 21))
+        .opacity(0.9)
+    
+    Button { ... } label: { ... }
+}.padding(.bottom, 14)
+```
+
+<ParamField path="title" type="Text">
+  - **Font**: Montserrat Bold, 21pt
+  - **Opacity**: 0.9 for subtle visual softening
+  - **Text**: "Experience"
+</ParamField>
+
+<ParamField path="headerSpacing" type="CGFloat" default="16">
+  16pt spacing between the section title and toggle button.
+</ParamField>
+
+<ParamField path="bottomPadding" type="CGFloat" default="14">
+  14pt padding below the header before experience entries begin.
+</ParamField>
+
+### Experience list
+
+```swift
+if(showExperiences) {
+    ForEach(experience) {experience in
+        ExperienceView(experience: experience)
+    }
+}
+```
+
+- **Conditional rendering**: Only renders when `showExperiences` is `true`
+- **Iteration**: Uses ForEach to iterate through experience array
+- **Components**: Each entry rendered as separate ExperienceView
+
+<Note>
+  The conditional rendering optimizes performance by removing experience views from the view hierarchy when collapsed, rather than just hiding them.
+</Note>
+
+## Animation behavior
+
+When the user interacts with the toggle button:
+
+1. **Tap detected**: Button action triggers
+2. **Animation wraps state change**: `withAnimation(.easeInOut(duration: 0.4))`
+3. **State toggles**: `showExperiences` flips between true/false
+4. **Visual transitions**:
+   - Chevron smoothly rotates 180 degrees
+   - Experience list fades in/out
+   - Layout height adjusts fluidly
+   - Parent ScrollView adapts to content size
+
+<Tip>
+  The 0.4-second duration provides a balance between responsiveness and smoothness, allowing users to perceive the transition without feeling sluggish.
+</Tip>
+
+## Design patterns
+
+### Consistent with SkillsView
+
+Both sections share identical interaction patterns:
+
+| Feature | SkillsView | ExperiencesView |
+|---------|------------|------------------|
+| Animation duration | 0.4s | 0.4s |
+| Animation type | easeInOut | easeInOut |
+| Default state | Expanded | Expanded |
+| Toggle icon | Chevron | Chevron |
+| Font size | 21pt | 21pt |
+| Font weight | Bold | Bold |
+
+<Tip>
+  This consistency helps users quickly understand the interaction model without learning new patterns for each section.
+</Tip>
+
+### Vertical spacing hierarchy
+
+- **24pt**: Between experience entries (main content spacing)
+- **16pt**: Between title and button (header element spacing)
+- **14pt**: Below header before content (section separation)
+
+## Preview configuration
+
+```swift
+struct ExperiencesView_Previews: PreviewProvider {
+    static var previews: some View {
+        GeometryReader { proxy in
+            ExperiencesView(experience: AppModel().portfolio.experience)
+                .padding (24)
+        }
+    }
+}
+```
+
+The preview setup:
+- Uses sample data from `AppModel().portfolio.experience`
+- Wraps in GeometryReader for responsive preview
+- Applies 24pt padding for realistic spacing visualization
+
+## Usage example
+
+```swift
+ExperiencesView(experience: appModel.portfolio.experience)
+    .padding(.top, 42)
+```
+
+Typically used in PortfolioView with:
+- Experience data from the app model
+- 42pt top margin to separate from the Skills section
+- Positioned at the bottom of the main content VStack
+
+<Note>
+  The 42pt top margin creates a stronger visual separation between Skills and Experience sections compared to the internal spacing within each section.
+</Note>

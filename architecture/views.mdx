@@ -1,0 +1,573 @@
+---
+title: Views
+description: SwiftUI view architecture and component hierarchy for displaying portfolio information
+---
+
+## Overview
+
+The OI Resume App uses a composable SwiftUI view architecture with a clear hierarchy. The main view contains three section views, each composed of smaller, reusable components.
+
+## View hierarchy
+
+```
+PortfolioView (Main container)
+├── HeaderView
+├── SkillsView
+│   └── SkillView (repeated)
+└── ExperiencesView
+    └── ExperienceView (repeated)
+```
+
+## PortfolioView
+
+The main container view that orchestrates the entire portfolio display.
+
+### Implementation
+
+```swift Code/Views/PortfolioView.swift
+struct PortfolioView: View {
+    
+    var appModel: AppModel = AppModel()
+    
+    var body: some View {
+        ZStack {
+            Color(UIColor.systemBackground)
+                .ignoresSafeArea()
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(alignment: .leading) {
+                    
+                    HeaderView(appModel: appModel)
+                    
+                    SkillsView(skills: appModel.portfolio.skills, width: UIScreen.main.bounds.width + 5)
+                        .padding(.top, 32)
+                    
+                    ExperiencesView(experience: appModel.portfolio.experience)
+                        .padding(.top, 42)
+                }
+                .padding(24)
+            }
+        }
+    }
+}
+```
+
+### Key features
+
+<AccordionGroup>
+  <Accordion title="Adaptive background">
+    Uses `Color(UIColor.systemBackground)` to automatically adapt to light and dark mode
+    
+    ```swift
+    Color(UIColor.systemBackground)
+        .ignoresSafeArea()
+    ```
+  </Accordion>
+
+  <Accordion title="Scrollable content">
+    Wraps content in a `ScrollView` with vertical scrolling and hidden indicators
+    
+    ```swift
+    ScrollView(.vertical, showsIndicators: false) {
+        // Content
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="Consistent spacing">
+    Uses padding modifiers to create visual hierarchy:
+    - Base padding: 24pt
+    - Skills section top padding: 32pt
+    - Experience section top padding: 42pt
+  </Accordion>
+</AccordionGroup>
+
+### Data flow
+
+<Steps>
+  <Step title="Initialize AppModel">
+    Creates an instance of `AppModel` containing portfolio data
+  </Step>
+  <Step title="Pass to HeaderView">
+    Sends entire `appModel` to HeaderView for profile information
+  </Step>
+  <Step title="Extract collections">
+    Passes specific arrays to SkillsView and ExperiencesView
+  </Step>
+</Steps>
+
+<Note>
+The view creates its own `AppModel` instance. For more complex apps, consider using `@StateObject` or environment injection.
+</Note>
+
+## HeaderView
+
+Displays personal information, profile photo, and contact links.
+
+### Implementation
+
+```swift Code/Views/SupportViews/HeaderView.swift
+struct HeaderView: View {
+    
+    var appModel: AppModel
+    
+    var body: some View {
+        VStack {
+            HStack {
+                Spacer()
+                Image("display_photo")
+                    .resizable()
+                    .frame(width: 100, height: 100)
+                    .padding(-0.94)
+                    .background(
+                        Circle()
+                            .opacity(0.5)
+                            .shadow(radius: 7)
+                    )
+                Spacer()
+            }
+            
+            Text(appModel.portfolio.name)
+                .font(Montserrat.bold.font(size: 17))
+                .padding(.top, 8)
+            
+            Text(appModel.portfolio.role)
+                .font(Montserrat.mediumItalic.font(size: 18))
+                .opacity(0.85)
+                .padding(.top, -2)
+            
+            // Location, LinkedIn, GitHub, and description
+            // ...
+        }
+    }
+}
+```
+
+### Layout structure
+
+<Tabs>
+  <Tab title="Profile photo">
+    Centered circular image with shadow:
+    
+    ```swift
+    Image("display_photo")
+        .resizable()
+        .frame(width: 100, height: 100)
+        .background(
+            Circle()
+                .opacity(0.5)
+                .shadow(radius: 7)
+        )
+    ```
+  </Tab>
+
+  <Tab title="Personal info">
+    Name and role with custom typography:
+    
+    ```swift
+    Text(appModel.portfolio.name)
+        .font(Montserrat.bold.font(size: 17))
+    
+    Text(appModel.portfolio.role)
+        .font(Montserrat.mediumItalic.font(size: 18))
+        .opacity(0.85)
+    ```
+  </Tab>
+
+  <Tab title="Contact links">
+    Location and social links with icons:
+    
+    ```swift
+    HStack {
+        Image(systemName: "location.fill")
+            .font(.system(size: 18, weight: .semibold))
+        Text(appModel.portfolio.location)
+            .font(Montserrat.medium.font(size: 17))
+    }
+    .opacity(0.45)
+    ```
+  </Tab>
+</Tabs>
+
+### Custom fonts
+
+<Info>
+The view uses `Montserrat` custom fonts via `FontManager.swift`. Available variants include: `.bold`, `.mediumItalic`, `.medium`, etc.
+</Info>
+
+## SkillsView
+
+Displays a collapsible grid of skills with toggle functionality.
+
+### Implementation
+
+```swift Code/Views/SupportViews/SkillsView.swift
+struct SkillsView: View {
+    
+    var skills: [Skill]
+    var width: CGFloat
+    
+    @State var showSkills = true
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            HStack(spacing: 16) {
+                Text("Skills")
+                    .font(Montserrat.bold.font(size: 21))
+                    .opacity(0.9)
+                
+                Button {
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        showSkills.toggle()
+                    }
+                } label: {
+                    Image(systemName: "chevron.up")
+                        .font(.system(size: 18, weight: .medium))
+                        .rotationEffect(self.showSkills ? .zero : .degrees(180))
+                }.buttonStyle(PlainButtonStyle())
+            }
+            
+            if(showSkills) {
+                LazyVGrid(columns: [GridItem(), GridItem(), GridItem()], alignment: .leading, spacing: 12) {
+                    ForEach(skills) {skill in
+                        SkillView(skill: skill, width: width / 3 - 24)
+                    }
+                }.padding(.top, 38)
+            }
+        }
+    }
+}
+```
+
+### Key features
+
+<CardGroup cols={2}>
+  <Card title="Collapsible section" icon="chevron-up">
+    Toggle button with animated chevron rotation
+  </Card>
+  <Card title="Grid layout" icon="grid">
+    3-column LazyVGrid for skill cards
+  </Card>
+  <Card title="State management" icon="toggle-on">
+    `@State` property controls visibility
+  </Card>
+  <Card title="Smooth animation" icon="wand-magic-sparkles">
+    0.4s ease-in-out transition
+  </Card>
+</CardGroup>
+
+### Grid configuration
+
+```swift
+LazyVGrid(
+    columns: [GridItem(), GridItem(), GridItem()],
+    alignment: .leading,
+    spacing: 12
+) {
+    ForEach(skills) { skill in
+        SkillView(skill: skill, width: width / 3 - 24)
+    }
+}
+```
+
+<Note>
+`LazyVGrid` creates a 3-column grid with flexible column widths. Each `SkillView` receives a calculated width based on screen size.
+</Note>
+
+## SkillView
+
+Individual skill card with icon and label.
+
+### Implementation
+
+```swift Code/Views/SupportViews/SkillView.swift
+struct SkillView: View {
+    var skill: Skill
+    var width: CGFloat = 100
+    
+    var body: some View {
+        VStack {
+            Image(systemName: skill.image)
+                .font(.system(size: 25, weight: .medium))
+                .opacity(0.8)
+            
+            Text(skill.skillName)
+                .font(Montserrat.semibold.font(size: 12))
+                .padding(.top, 10.0)
+        }
+        .padding()
+        .frame(width: width, height: 115)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+            .opacity(0.075))
+    }
+}
+```
+
+### Design elements
+
+<Tabs>
+  <Tab title="Card style">
+    Rounded rectangle with subtle background:
+    
+    ```swift
+    .background(
+        RoundedRectangle(cornerRadius: 12)
+            .opacity(0.075)
+    )
+    ```
+  </Tab>
+
+  <Tab title="SF Symbol icon">
+    System icon with medium weight:
+    
+    ```swift
+    Image(systemName: skill.image)
+        .font(.system(size: 25, weight: .medium))
+        .opacity(0.8)
+    ```
+  </Tab>
+
+  <Tab title="Fixed dimensions">
+    Consistent card size:
+    
+    ```swift
+    .frame(width: width, height: 115)
+    ```
+  </Tab>
+</Tabs>
+
+## ExperiencesView
+
+Displays a collapsible list of work experiences.
+
+### Implementation
+
+```swift Code/Views/SupportViews/ExperiencesView.swift
+struct ExperiencesView: View {
+    
+    var experience: [Experience]
+    
+    @State var showExperiences = true
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            HStack(spacing: 16) {
+                Text("Experience")
+                    .font(Montserrat.bold.font(size: 21))
+                    .opacity(0.9)
+                
+                Button {
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        showExperiences.toggle()
+                    }
+                } label: {
+                    Image(systemName: "chevron.up")
+                        .font(.system(size: 18, weight: .medium))
+                        .rotationEffect(self.showExperiences ? .zero : .degrees(180))
+                }.buttonStyle(PlainButtonStyle())
+            }.padding(.bottom, 14)
+            
+            if(showExperiences) {
+                ForEach(experience) {experience in
+                    ExperienceView(experience: experience)
+                }
+            }
+        }
+    }
+}
+```
+
+### Features
+
+<AccordionGroup>
+  <Accordion title="Vertical list layout">
+    Uses `VStack` with 24pt spacing between experience cards
+  </Accordion>
+
+  <Accordion title="Toggle mechanism">
+    Same collapsible pattern as SkillsView with animated chevron
+  </Accordion>
+
+  <Accordion title="ForEach iteration">
+    Renders each experience using the `Identifiable` protocol
+  </Accordion>
+</AccordionGroup>
+
+## ExperienceView
+
+Timeline-style card for individual work experience entries.
+
+### Implementation
+
+```swift Code/Views/SupportViews/ExperienceView.swift
+struct ExperienceView: View {
+    var experience: Experience
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Circle()
+                .frame(width: 10, height: 10)
+                .opacity(0.65)
+            
+            HStack {
+                RoundedRectangle(cornerRadius: 8)
+                    .frame(width: 3)
+                    .padding(.leading, 3)
+                
+                VStack(alignment: .leading) {
+                    Text(experience.role)
+                        .font(Montserrat.semibold.font(size: 18.5))
+                    
+                    Text(experience.companyName)
+                        .font(Montserrat.medium.font(size: 16.5))
+                        .opacity(0.8)
+                        .padding(.top, 4)
+                    
+                    Text(experience.duration)
+                        .font(Montserrat.mediumItalic.font(size: 16))
+                        .opacity(0.5)
+                        .padding(.top, 14)
+                }.padding(.leading, 14)
+            }.padding(.top, 8)
+        }.fixedSize()
+    }
+}
+```
+
+### Timeline design
+
+<Steps>
+  <Step title="Timeline dot">
+    Small circle at the top:
+    ```swift
+    Circle()
+        .frame(width: 10, height: 10)
+        .opacity(0.65)
+    ```
+  </Step>
+
+  <Step title="Vertical line">
+    Thin rounded rectangle:
+    ```swift
+    RoundedRectangle(cornerRadius: 8)
+        .frame(width: 3)
+    ```
+  </Step>
+
+  <Step title="Content card">
+    Role, company, and duration with varying opacity for visual hierarchy
+  </Step>
+</Steps>
+
+<Info>
+The `.fixedSize()` modifier ensures the view doesn't expand beyond its content, maintaining timeline alignment.
+</Info>
+
+## View communication patterns
+
+### Data passing
+
+<Tabs>
+  <Tab title="Full model">
+    HeaderView receives the entire AppModel:
+    
+    ```swift
+    HeaderView(appModel: appModel)
+    ```
+  </Tab>
+
+  <Tab title="Array extraction">
+    Section views receive specific arrays:
+    
+    ```swift
+    SkillsView(skills: appModel.portfolio.skills, width: width)
+    ExperiencesView(experience: appModel.portfolio.experience)
+    ```
+  </Tab>
+
+  <Tab title="Single item">
+    Item views receive individual models:
+    
+    ```swift
+    SkillView(skill: skill, width: width)
+    ExperienceView(experience: experience)
+    ```
+  </Tab>
+</Tabs>
+
+### State management
+
+<CodeGroup>
+
+```swift Local state
+@State var showSkills = true
+@State var showExperiences = true
+```
+
+```swift Toggle action
+Button {
+    withAnimation(.easeInOut(duration: 0.4)) {
+        showSkills.toggle()
+    }
+} label: {
+    Image(systemName: "chevron.up")
+        .rotationEffect(self.showSkills ? .zero : .degrees(180))
+}
+```
+
+</CodeGroup>
+
+## Styling and theming
+
+### Custom fonts
+
+The app uses Montserrat font family:
+
+```swift
+.font(Montserrat.bold.font(size: 21))
+.font(Montserrat.mediumItalic.font(size: 18))
+.font(Montserrat.semibold.font(size: 12))
+```
+
+### Opacity hierarchy
+
+Visual hierarchy through opacity:
+
+- Primary text: 0.85 - 1.0
+- Secondary text: 0.5 - 0.8
+- Subtle elements: 0.4 - 0.5
+- Background cards: 0.075
+
+### Adaptive colors
+
+<Note>
+The app uses `UIColor.systemBackground` and system colors to automatically support light and dark mode.
+</Note>
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Component reusability" icon="recycle">
+    Small, focused views that can be reused and tested independently
+  </Card>
+  <Card title="Composition over inheritance" icon="layer-group">
+    Build complex UIs by composing simple views
+  </Card>
+  <Card title="Consistent spacing" icon="ruler">
+    Use padding multiples for visual rhythm (8, 12, 14, 24, 32, 38, 42)
+  </Card>
+  <Card title="Semantic naming" icon="tag">
+    View names clearly indicate their purpose and content
+  </Card>
+</CardGroup>
+
+## Related documentation
+
+<CardGroup cols={2}>
+  <Card title="Data models" icon="database" href="/architecture/data-models">
+    Learn about the data structures displayed in these views
+  </Card>
+  <Card title="App state" icon="circle-nodes" href="/architecture/app-state">
+    Understand how AppModel provides data to views
+  </Card>
+</CardGroup>

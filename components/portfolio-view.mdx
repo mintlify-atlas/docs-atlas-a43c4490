@@ -1,0 +1,124 @@
+---
+title: Portfolio view
+description: Main view component that orchestrates the resume app layout with header, skills, and experience sections
+---
+
+## Overview
+
+The `PortfolioView` is the main container view for the OI Resume App. It manages the overall layout and composition of the resume, arranging the header, skills, and experience sections in a vertically scrollable interface.
+
+<Note>
+  This view uses SwiftUI's `ZStack` and `ScrollView` to create a responsive, scrollable resume layout that adapts to the device's system background color.
+</Note>
+
+## Component structure
+
+The view hierarchy is organized as follows:
+
+- **ZStack**: Root container that layers the background color
+- **ScrollView**: Vertical scrolling container
+- **VStack**: Vertically stacked content with left alignment
+  - HeaderView: Profile information and bio
+  - SkillsView: Grid of technical skills
+  - ExperiencesView: List of work experience
+
+## Source code
+
+```swift
+import SwiftUI
+
+struct PortfolioView: View {
+    
+    var appModel: AppModel = AppModel()
+    
+    var body: some View {
+        ZStack {
+            Color(UIColor.systemBackground)
+                .ignoresSafeArea()
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(alignment: .leading) {
+                    
+                    HeaderView(appModel: appModel)
+                    
+                    SkillsView(skills: appModel.portfolio.skills, width: UIScreen.main.bounds.width + 5 )
+                        .padding(.top, 32)
+                    
+                    ExperiencesView(experience: appModel.portfolio.experience)
+                        .padding(.top, 42)
+                }
+                .padding(24)
+            }
+        }
+    }
+}
+```
+
+## Properties
+
+<ParamField path="appModel" type="AppModel" default="AppModel()">
+  The data model containing all portfolio information including name, role, skills, and experience. Initialized with default values from the AppModel class.
+</ParamField>
+
+## Layout specifications
+
+### Spacing and padding
+
+- **Container padding**: 24pt on all sides
+- **Skills section top margin**: 32pt
+- **Experience section top margin**: 42pt
+
+<Tip>
+  The scroll indicators are hidden (`showsIndicators: false`) to create a cleaner, more native resume feel.
+</Tip>
+
+### Width calculation
+
+The SkillsView receives a width parameter of `UIScreen.main.bounds.width + 5`, which accounts for:
+- Full screen width
+- Additional 5pt to compensate for grid spacing and ensure proper alignment
+
+## Design features
+
+### Adaptive background
+
+The view uses `Color(UIColor.systemBackground)` which automatically adapts to:
+- Light mode: white background
+- Dark mode: black background
+
+### Scroll behavior
+
+- Vertical scrolling only
+- No visible scroll indicators
+- Content extends to safe area edges for the background color
+
+## Preview configuration
+
+```swift
+struct PortfolioView_Previews: PreviewProvider {
+    static var previews: some View {
+        PortfolioView()
+            .colorScheme(.dark)
+    }
+}
+```
+
+The preview is configured to display in dark mode for testing visual consistency.
+
+## Usage example
+
+```swift
+import SwiftUI
+
+@main
+struct OI_PortfolioApp: App {
+    var body: some Scene {
+        WindowGroup {
+            PortfolioView()
+        }
+    }
+}
+```
+
+<Note>
+  The PortfolioView is typically used as the root view in the app's entry point, as it manages the complete resume interface.
+</Note>

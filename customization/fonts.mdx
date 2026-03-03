@@ -1,0 +1,161 @@
+---
+title: Customize fonts
+description: Learn how to use and customize the Montserrat font system in your OI Resume App
+---
+
+The OI Resume App uses a custom font manager that provides access to the Montserrat font family with multiple weights and styles.
+
+## Font manager overview
+
+The `FontManager.swift` file defines a `Montserrat` enum that provides type-safe access to different font variants. This approach ensures consistent typography throughout your app.
+
+### Available font variants
+
+The Montserrat enum includes these font styles:
+
+- `thin` - Montserrat Thin
+- `thinItalic` - Montserrat Thin Italic
+- `regular` - Montserrat Regular
+- `italic` - Montserrat Italic
+- `medium` - Montserrat Medium
+- `mediumItalic` - Montserrat Medium Italic
+- `semibold` - Montserrat SemiBold
+- `semiboldItalic` - Montserrat SemiBold Italic
+- `bold` - Montserrat Bold
+
+## Using fonts in your views
+
+<Steps>
+  <Step title="Import SwiftUI">
+    Ensure SwiftUI is imported in your view file:
+    
+    ```swift
+    import SwiftUI
+    ```
+  </Step>
+
+  <Step title="Apply the font modifier">
+    Use the Montserrat enum with the `.font()` method and specify your desired size:
+    
+    ```swift
+    Text("Hello World")
+        .font(Montserrat.bold.font(size: 17))
+    ```
+  </Step>
+
+  <Step title="Combine with other modifiers">
+    Chain additional SwiftUI modifiers as needed:
+    
+    ```swift
+    Text(appModel.portfolio.name)
+        .font(Montserrat.bold.font(size: 17))
+        .padding(.top, 8)
+    ```
+  </Step>
+</Steps>
+
+## Real-world examples
+
+Here are examples from the actual source code showing how fonts are used:
+
+<CodeGroup>
+```swift HeaderView.swift
+// Bold text for name
+Text(appModel.portfolio.name)
+    .font(Montserrat.bold.font(size: 17))
+    .padding(.top, 8)
+
+// Medium italic for role
+Text(appModel.portfolio.role)
+    .font(Montserrat.mediumItalic.font(size: 18))
+    .opacity(0.85)
+    .padding(.top, -2)
+
+// Medium for location
+Text(appModel.portfolio.location)
+    .font(Montserrat.medium.font(size: 17))
+```
+
+```swift SkillView.swift
+// Semibold for skill names
+Text(skill.skillName)
+    .font(Montserrat.semibold.font(size: 12))
+    .padding(.top, 10.0)
+```
+</CodeGroup>
+
+## Implementation details
+
+The font manager implementation from `Utilities/FontManager.swift`:
+
+```swift
+enum Montserrat {
+    case thin
+    case thinItalic
+    case regular
+    case italic
+    case medium
+    case mediumItalic
+    case semibold
+    case semiboldItalic
+    case bold
+    
+    func font(size: CGFloat) -> Font {
+        switch self {
+        case .thin:
+            return .custom("Montserrat-Thin", size: size)
+        case .thinItalic:
+            return .custom("Montserrat-ThinItalic", size: size)
+        case .regular:
+            return .custom("Montserrat-Regular", size: size)
+        case .italic:
+            return .custom("Montserrat-Italic", size: size)
+        case .medium:
+            return .custom("Montserrat-Medium", size: size)
+        case .mediumItalic:
+            return .custom("Montserrat-MediumItalic", size: size)
+        case .semibold:
+            return .custom("Montserrat-SemiBold", size: size)
+        case .semiboldItalic:
+            return .custom("Montserrat-SemiBoldIta", size: size)
+        case .bold:
+            return .custom("Montserrat-Bold", size: size)
+        }
+    }
+}
+```
+
+<Tip>
+The enum-based approach provides autocomplete support in Xcode, making it easier to discover available font variants while coding.
+</Tip>
+
+## Replacing with a different font
+
+To use a different font family:
+
+<Steps>
+  <Step title="Add font files to your project">
+    Add your custom font files (.ttf or .otf) to the Xcode project.
+  </Step>
+
+  <Step title="Update Info.plist">
+    Register the fonts in your `Info.plist` under "Fonts provided by application".
+  </Step>
+
+  <Step title="Modify FontManager.swift">
+    Update the font names in the `.custom()` calls:
+    
+    ```swift
+    case .regular:
+        return .custom("YourFont-Regular", size: size)
+    ```
+  </Step>
+
+  <Step title="Test across views">
+    Rebuild and verify the new fonts appear correctly throughout the app.
+  </Step>
+</Steps>
+
+<Warning>
+Make sure font names in the `.custom()` method exactly match the font's PostScript name, not the file name. You can find the PostScript name by opening the font in Font Book on macOS.
+</Warning>

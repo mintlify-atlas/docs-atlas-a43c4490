@@ -1,0 +1,259 @@
+---
+title: Update portfolio content
+description: Customize your personal information, skills, and experience in the OI Resume App
+---
+
+All portfolio content is managed through the `AppModel` class, which provides a centralized data source for your personal information, skills, and work experience.
+
+## AppModel overview
+
+The `AppModel` class in `Code/Services/AppModel.swift` is an `ObservableObject` that holds your portfolio data. This architecture allows views to automatically update when data changes.
+
+```swift
+class AppModel: ObservableObject {
+    var portfolio: Portfolio = Portfolio(
+        // ... your portfolio data
+    )
+}
+```
+
+## Portfolio data structure
+
+The `Portfolio` struct from `Code/Models/Portfolio.swift` defines the content structure:
+
+```swift
+struct Portfolio {
+    let name: String
+    let role: String
+    let description: String
+    let linkedin: String
+    let github: String
+    let location: String
+    let skills: [Skill]
+    let experience: [Experience]
+}
+```
+
+## Updating personal information
+
+<Steps>
+  <Step title="Open AppModel.swift">
+    Navigate to `Code/Services/AppModel.swift` in your Xcode project.
+  </Step>
+
+  <Step title="Modify the Portfolio initializer">
+    Update the personal information fields:
+    
+    ```swift
+    var portfolio: Portfolio = Portfolio(
+        name: "Your Name",
+        role: "Your Job Title",
+        description: "Your professional summary.",
+        linkedin: "your-linkedin-username",
+        github: "your-github-username",
+        location: "Your Location",
+        skills: [...],
+        experience: [...]
+    )
+    ```
+  </Step>
+
+  <Step title="Save and rebuild">
+    Save the file and rebuild your app to see the changes.
+  </Step>
+</Steps>
+
+<Tip>
+The `linkedin` and `github` fields should contain just your username, not the full URL. The app handles formatting automatically.
+</Tip>
+
+## Managing skills
+
+Skills are defined using the `Skill` struct:
+
+```swift
+struct Skill: Identifiable {
+    var id: String
+    let skillName: String
+    let image: String  // SF Symbol name
+}
+```
+
+### Adding new skills
+
+Here's the current skills configuration from `AppModel.swift`:
+
+```swift
+skills: [
+    Skill(id: UUID().uuidString, skillName: "Mobile", image: "iphone"),
+    Skill(id: UUID().uuidString, skillName: "API", image: "laptopcomputer"),
+    Skill(id: UUID().uuidString, skillName: "Accessibility", image: "accessibility"),
+    Skill(id: UUID().uuidString, skillName: "Automation", image: "dot.scope.laptopcomputer"),
+    Skill(id: UUID().uuidString, skillName: "Database", image: "square.stack.3d.up.badge.automatic.fill"),
+    Skill(id: UUID().uuidString, skillName: "CI/CD", image: "infinity")
+]
+```
+
+<Steps>
+  <Step title="Choose an SF Symbol">
+    Browse available icons at [SF Symbols](https://developer.apple.com/sf-symbols/) or use the SF Symbols app.
+  </Step>
+
+  <Step title="Add to the skills array">
+    Insert a new `Skill` object:
+    
+    ```swift
+    Skill(
+        id: UUID().uuidString,
+        skillName: "Swift",
+        image: "swift"
+    ),
+    ```
+  </Step>
+
+  <Step title="Maintain consistent formatting">
+    Keep skill names concise and use relevant SF Symbols that are easily recognizable.
+  </Step>
+</Steps>
+
+<Warning>
+Each skill must have a unique `id`. Always use `UUID().uuidString` to generate unique identifiers automatically.
+</Warning>
+
+### Removing or reordering skills
+
+To remove a skill, simply delete its entry from the array. To reorder, cut and paste entries in your desired sequence.
+
+## Managing experience
+
+Experience entries are defined using the `Experience` struct:
+
+```swift
+struct Experience: Identifiable {
+    var id: String
+    let companyName: String
+    let role: String
+    let duration: String
+}
+```
+
+### Current experience configuration
+
+From `AppModel.swift:19-25`:
+
+```swift
+experience: [
+    Experience(id: UUID().uuidString, companyName: "INIT Creative", role: "AI Specialist", duration: "July 2024 - Present"),
+    Experience(id: UUID().uuidString, companyName: "Digivante", role: "Freelance Tester", duration: "Jan 2023 - Present"),
+    Experience(id: UUID().uuidString, companyName: "Vertex", role: "QA Engineer", duration: "Apr 2022 - Dec 2022"),
+    Experience(id: UUID().uuidString, companyName: "Renmoney", role: "QA Engineer", duration: "Jun 2021 - Apr 2022"),
+    Experience(id: UUID().uuidString, companyName: "RGS", role: "Software Tester", duration: "Sept 2019 - Jun 2021")
+]
+```
+
+### Adding work experience
+
+<Steps>
+  <Step title="Determine the position">
+    Experience entries are displayed in order, so place most recent roles first.
+  </Step>
+
+  <Step title="Add the Experience object">
+    ```swift
+    Experience(
+        id: UUID().uuidString,
+        companyName: "Company Name",
+        role: "Your Role",
+        duration: "Start Date - End Date"
+    ),
+    ```
+  </Step>
+
+  <Step title="Format consistently">
+    Use consistent date formatting like "Jan 2023 - Present" or "Jun 2021 - Apr 2022".
+  </Step>
+</Steps>
+
+## Complete example
+
+Here's a complete example of updating `AppModel.swift`:
+
+<CodeGroup>
+```swift Current (Default)
+class AppModel: ObservableObject {
+    var portfolio: Portfolio = Portfolio(
+        name: "Olawale Ibitoye",
+        role: "QA Engineer",
+        description: "Experienced Tester with a profound passion for Technology.",
+        linkedin: "olawale-ibitoye",
+        github: "olaeben",
+        location: "United Kingdom",
+        skills: [
+            Skill(id: UUID().uuidString, skillName: "Mobile", image: "iphone"),
+            Skill(id: UUID().uuidString, skillName: "API", image: "laptopcomputer")
+        ],
+        experience: [
+            Experience(id: UUID().uuidString, companyName: "INIT Creative", role: "AI Specialist", duration: "July 2024 - Present")
+        ]
+    )
+}
+```
+
+```swift Customized
+class AppModel: ObservableObject {
+    var portfolio: Portfolio = Portfolio(
+        name: "Jane Smith",
+        role: "iOS Developer",
+        description: "Passionate iOS developer specializing in SwiftUI and modern app architecture.",
+        linkedin: "janesmith",
+        github: "janesmith-dev",
+        location: "San Francisco, CA",
+        skills: [
+            Skill(id: UUID().uuidString, skillName: "SwiftUI", image: "swift"),
+            Skill(id: UUID().uuidString, skillName: "UIKit", image: "app.badge"),
+            Skill(id: UUID().uuidString, skillName: "Core Data", image: "cylinder.split.1x2")
+        ],
+        experience: [
+            Experience(id: UUID().uuidString, companyName: "Tech Corp", role: "Senior iOS Developer", duration: "Jan 2023 - Present"),
+            Experience(id: UUID().uuidString, companyName: "Startup Inc", role: "iOS Developer", duration: "Mar 2020 - Dec 2022")
+        ]
+    )
+}
+```
+</CodeGroup>
+
+## Profile photo
+
+The profile photo is referenced in `HeaderView.swift:18`:
+
+```swift
+Image("display_photo")
+    .resizable()
+    .frame(width: 100, height: 100)
+```
+
+<Steps>
+  <Step title="Add your image to assets">
+    Add your photo to the Assets.xcassets folder in Xcode.
+  </Step>
+
+  <Step title="Name it 'display_photo'">
+    Either name your asset "display_photo" or update the image name in `HeaderView.swift`.
+  </Step>
+
+  <Step title="Optimize image size">
+    Use a square image at least 200x200 pixels for best quality on all devices.
+  </Step>
+</Steps>
+
+<Tip>
+For the best circular profile photo appearance, use a square image with important content centered, as the edges will be cropped by the circular frame.
+</Tip>
+
+## Best practices
+
+- **Keep descriptions concise**: The description field works best with 1-2 sentences
+- **Use SF Symbols**: Stick to SF Symbols for skill icons to maintain consistency
+- **Order matters**: List experience and skills in reverse chronological order (most recent first)
+- **Unique IDs**: Always use `UUID().uuidString` for generating unique identifiers
+- **Test on device**: Preview changes on actual devices to ensure proper layout and sizing

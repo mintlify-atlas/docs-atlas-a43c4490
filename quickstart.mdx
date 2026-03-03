@@ -1,80 +1,449 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quick start
+description: Build and run the OI Resume App in minutes, then customize it with your own portfolio data
 ---
 
-## Get started in three steps
+## Build and run
 
-Get your documentation site running locally and make your first customization.
+Get the OI Resume App running on your iOS simulator in just a few steps.
 
-### Step 1: Set up your local environment
-
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
+<Steps>
+  <Step title="Clone the repository">
+    Clone the repository and navigate to the project directory:
     
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
+    ```bash
+    git clone https://github.com/olaeben/Resume-App.git
+    cd Resume-App
+    ```
+  </Step>
+
+  <Step title="Open in Xcode">
+    Open the Xcode project:
     
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+    ```bash
+    open OI_Portfolio.xcodeproj
+    ```
+  </Step>
 
-### Step 2: Deploy your changes
+  <Step title="Select a simulator">
+    In Xcode's toolbar, select a target device from the simulator menu. We recommend:
+    - iPhone 14 Pro
+    - iPhone 15
+    - Any device running iOS 14.0 or later
+  </Step>
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
+  <Step title="Build and run">
+    Click the Run button (▶️) or press `Cmd + R` to build and run the app.
     
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    The app will compile and launch in the iOS Simulator.
+  </Step>
+</Steps>
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+<Note>
+  The first build may take a few minutes as Xcode compiles all the source files and resources.
+</Note>
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+## Explore the app
 
-### Step 3: Go live
+Once the app is running, you'll see a beautiful portfolio interface with:
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+<CardGroup cols={2}>
+  <Card title="Profile header" icon="user">
+    Name, role, location, and social links with a circular profile photo
+  </Card>
+  <Card title="Skills section" icon="code">
+    A grid of skill cards with icons (Mobile, API, Accessibility, Automation, Database, CI/CD)
+  </Card>
+  <Card title="Experience section" icon="briefcase">
+    A timeline of professional experiences with company names, roles, and durations
+  </Card>
+  <Card title="Interactive toggles" icon="chevron-up">
+    Collapsible sections with smooth animations and rotating chevron icons
+  </Card>
+</CardGroup>
+
+### Try the interactive features
+
+<Steps>
+  <Step title="Toggle skills">
+    Tap the chevron button next to "Skills" to collapse/expand the skills grid with a smooth animation.
+  </Step>
+  <Step title="Toggle experience">
+    Tap the chevron button next to "Experience" to collapse/expand the experience list.
+  </Step>
+  <Step title="Test dark mode">
+    In the Simulator, go to Settings → Developer → Dark Appearance to see the app adapt to dark mode.
+  </Step>
+</Steps>
+
+## Customize with your data
+
+Now let's personalize the app with your own portfolio information.
+
+### Update portfolio data
+
+All portfolio data is configured in the `AppModel.swift` file:
+
+<CodeGroup>
+```swift OI_Portfolio/Code/Services/AppModel.swift
+import Foundation
+
+class AppModel: ObservableObject {
+    var portfolio: Portfolio = Portfolio(
+        name: "Olawale Ibitoye", 
+        role: "QA Engineer", 
+        description: "Experienced Tester with a profound passion for Technology.", 
+        linkedin: "olawale-ibitoye", 
+        github: "olaeben", 
+        location: "United Kingdom",
+        
+        skills: [
+            Skill(id: UUID().uuidString, skillName: "Mobile", image: "iphone"),
+            Skill(id: UUID().uuidString, skillName: "API", image: "laptopcomputer"),
+            Skill(id: UUID().uuidString, skillName: "Accessibility", image: "accessibility"),
+            Skill(id: UUID().uuidString, skillName: "Automation", image: "dot.scope.laptopcomputer"),
+            Skill(id: UUID().uuidString, skillName: "Database", image: "square.stack.3d.up.badge.automatic.fill"),
+            Skill(id: UUID().uuidString, skillName: "CI/CD", image: "infinity")
+        ],
+        
+        experience: [
+            Experience(id: UUID().uuidString, companyName: "INIT Creative", role: "AI Specialist", duration: "July 2024 - Present"),
+            Experience(id: UUID().uuidString, companyName: "Digivante", role: "Freelance Tester", duration: "Jan 2023 - Present"),
+            Experience(id: UUID().uuidString, companyName: "Vertex", role: "QA Engineer", duration: "Apr 2022 - Dec 2022"),
+            Experience(id: UUID().uuidString, companyName: "Renmoney", role: "QA Engineer", duration: "Jun 2021 - Apr 2022"),
+            Experience(id: UUID().uuidString, companyName: "RGS", role: "Software Tester", duration: "Sept 2019 - Jun 2021")
+        ]
+    )
+}
+```
+</CodeGroup>
+
+### Step-by-step customization
+
+<Steps>
+  <Step title="Open AppModel.swift">
+    In Xcode's Project Navigator, navigate to:
+    ```
+    OI_Portfolio/Code/Services/AppModel.swift
+    ```
+  </Step>
+
+  <Step title="Update basic information">
+    Replace the portfolio properties with your information:
+    
+    ```swift
+    var portfolio: Portfolio = Portfolio(
+        name: "Your Name",
+        role: "Your Role",
+        description: "Your professional description.",
+        linkedin: "your-linkedin-username",
+        github: "your-github-username",
+        location: "Your Location",
+        // ...
+    )
+    ```
+  </Step>
+
+  <Step title="Customize skills">
+    Modify the skills array with your technical skills. Use SF Symbols for icons:
+    
+    ```swift
+    skills: [
+        Skill(id: UUID().uuidString, skillName: "Swift", image: "swift"),
+        Skill(id: UUID().uuidString, skillName: "React", image: "atom"),
+        Skill(id: UUID().uuidString, skillName: "Python", image: "terminal"),
+        // Add more skills...
+    ]
+    ```
+    
+    <Note>
+      Browse available SF Symbols at [Apple's SF Symbols app](https://developer.apple.com/sf-symbols/) or use the SF Symbols app in macOS.
+    </Note>
+  </Step>
+
+  <Step title="Update experiences">
+    Add your professional experience:
+    
+    ```swift
+    experience: [
+        Experience(
+            id: UUID().uuidString,
+            companyName: "Your Company",
+            role: "Your Role",
+            duration: "Start Date - End Date"
+        ),
+        // Add more experiences...
+    ]
+    ```
+  </Step>
+
+  <Step title="Add your profile photo">
+    Replace the profile photo in Assets.xcassets:
+    
+    1. In Xcode, navigate to `OI_Portfolio/Assets.xcassets`
+    2. Find the `display_photo` image set
+    3. Drag your profile photo (recommended: 300x300px) into the image well
+    4. Ensure it's set for "Universal" deployment
+  </Step>
+</Steps>
+
+### Rebuild and test
+
+After making your changes:
+
+```bash
+# In Xcode, press Cmd + R to rebuild and run
+# Or use Product → Run from the menu
+```
+
+Your personalized portfolio app will launch with your data!
+
+## Understanding the code structure
+
+Let's explore the key components:
+
+### Data models
+
+The app uses three main models defined in `Portfolio.swift`:
+
+<CodeGroup>
+```swift OI_Portfolio/Code/Models/Portfolio.swift
+struct Skill: Identifiable {
+    var id: String
+    let skillName: String
+    let image: String  // SF Symbol name
+}
+
+struct Experience: Identifiable {
+    var id: String
+    let companyName: String
+    let role: String
+    let duration: String
+}
+
+struct Portfolio {
+    let name: String
+    let role: String
+    let description: String
+    let linkedin: String
+    let github: String
+    let location: String
+    let skills: [Skill]
+    let experience: [Experience]
+}
+```
+</CodeGroup>
+
+### Main view structure
+
+The `PortfolioView` is the main container that composes all sections:
+
+<CodeGroup>
+```swift OI_Portfolio/Code/Views/PortfolioView.swift
+struct PortfolioView: View {
+    var appModel: AppModel = AppModel()
+    
+    var body: some View {
+        ZStack {
+            Color(UIColor.systemBackground)
+                .ignoresSafeArea()
+            
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(alignment: .leading) {
+                    HeaderView(appModel: appModel)
+                    
+                    SkillsView(
+                        skills: appModel.portfolio.skills,
+                        width: UIScreen.main.bounds.width + 5
+                    )
+                    .padding(.top, 32)
+                    
+                    ExperiencesView(
+                        experience: appModel.portfolio.experience
+                    )
+                    .padding(.top, 42)
+                }
+                .padding(24)
+            }
+        }
+    }
+}
+```
+</CodeGroup>
+
+### Collapsible sections
+
+Both `SkillsView` and `ExperiencesView` implement collapsible functionality:
+
+<CodeGroup>
+```swift OI_Portfolio/Code/Views/SupportViews/SkillsView.swift
+struct SkillsView: View {
+    var skills: [Skill]
+    var width: CGFloat
+    
+    @State var showSkills = true
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            HStack(spacing: 16) {
+                Text("Skills")
+                    .font(Montserrat.bold.font(size: 21))
+                    .opacity(0.9)
+                
+                Button {
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        showSkills.toggle()
+                    }
+                } label: {
+                    Image(systemName: "chevron.up")
+                        .font(.system(size: 18, weight: .medium))
+                        .rotationEffect(showSkills ? .zero : .degrees(180))
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+            
+            if showSkills {
+                LazyVGrid(
+                    columns: [GridItem(), GridItem(), GridItem()],
+                    alignment: .leading,
+                    spacing: 12
+                ) {
+                    ForEach(skills) { skill in
+                        SkillView(skill: skill, width: width / 3 - 24)
+                    }
+                }
+                .padding(.top, 38)
+            }
+        }
+    }
+}
+```
+</CodeGroup>
+
+<Note>
+  The `@State` property wrapper makes the toggle reactive, and `withAnimation` provides smooth transitions.
+</Note>
+
+## Run tests
+
+The app includes comprehensive XCUITests using the Page Object Model pattern.
+
+### Execute UI tests
+
+<Steps>
+  <Step title="Open test navigator">
+    In Xcode, press `Cmd + 6` to open the Test Navigator.
+  </Step>
+
+  <Step title="Run all tests">
+    Click the play button next to "OI_PortfolioUITests" to run all UI tests.
+    
+    Or press `Cmd + U` to run all tests in the project.
+  </Step>
+
+  <Step title="View test results">
+    Watch as the simulator automatically:
+    - Launches the app
+    - Verifies the author's name exists
+    - Toggles skills section on and off
+    - Toggles experience section on and off
+    - Confirms all elements are visible
+  </Step>
+</Steps>
+
+### Test structure
+
+The main UI test verifies all interactive features:
+
+<CodeGroup>
+```swift OI_PortfolioUITests/OITest/OI_PortfolioUITests.swift
+final class OI_ResumeTests: OIBaseTest {
+    func testResumePage() throws {
+        // Initialize the Page Object
+        let resumePage = ResumePage(app: app)
+        
+        // Verify Author's Name
+        resumePage.verifyAuthorNameExists()
+        
+        // Verify and Toggle Skills Section
+        resumePage.verifySkillsVisibility(shouldExist: true)
+        resumePage.toggleSkillsSection()
+        resumePage.verifySkillsVisibility(shouldExist: false)
+        
+        // Verify and Toggle Experience Section
+        resumePage.verifyExperienceVisibility(shouldExist: true)
+        resumePage.toggleExperienceSection()
+        resumePage.verifyExperienceVisibility(shouldExist: false)
+        
+        // Toggle Back the Skills and Experience Sections
+        resumePage.toggleExperienceSection()
+        resumePage.toggleSkillsSection()
+    }
+}
+```
+</CodeGroup>
+
+<Note>
+  The Page Object Model pattern separates test logic from page interactions, making tests easier to maintain.
+</Note>
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
-
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Customize fonts" icon="font" href="/customization/fonts">
+    Learn how to customize typography with Montserrat fonts
+  </Card>
+  <Card title="Customize themes" icon="palette" href="/customization/themes">
+    Configure dark and light mode colors
+  </Card>
+  <Card title="Update content" icon="pen" href="/customization/content">
+    Personalize your portfolio data and information
+  </Card>
+  <Card title="Page Object Model" icon="vial" href="/testing/page-object-model">
+    Learn about the testing architecture
+  </Card>
 </CardGroup>
 
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="App crashes on launch">
+    If the app crashes immediately:
+    
+    1. Check the Xcode console for error messages
+    2. Verify all assets (fonts, images) are properly included
+    3. Clean build folder: Product → Clean Build Folder (`Cmd + Shift + K`)
+    4. Reset simulator: Device → Erase All Content and Settings
+  </Accordion>
+
+  <Accordion title="Custom fonts not appearing">
+    If your custom fonts don't render:
+    
+    1. Verify font files are added to the project target
+    2. Check `OI-Portfolio-Info.plist` includes font names in `UIAppFonts`
+    3. Use the exact font name (case-sensitive)
+    4. Rebuild the project
+  </Accordion>
+
+  <Accordion title="Profile photo not showing">
+    If your profile photo doesn't appear:
+    
+    1. Ensure the image is named `display_photo` in Assets.xcassets
+    2. Check that the image set has a Universal target
+    3. Verify the image file is not corrupted
+    4. Recommended size: 300x300px or larger
+  </Accordion>
+
+  <Accordion title="SF Symbols not rendering">
+    If skill icons don't show:
+    
+    1. Verify you're using valid SF Symbol names
+    2. Browse available symbols in the SF Symbols app
+    3. Some symbols require iOS 15+ (check compatibility)
+    4. Use fallback symbols for older iOS versions
+  </Accordion>
+</AccordionGroup>
+
+<Check>
+  Congratulations! You've successfully built, run, and customized the OI Resume App. Happy coding!
+</Check>

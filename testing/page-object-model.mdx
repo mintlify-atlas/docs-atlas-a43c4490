@@ -1,0 +1,248 @@
+---
+title: Page Object Model
+description: Learn how the Page Object Model pattern is implemented in the OI Resume App test suite
+---
+
+The **Page Object Model (POM)** is a design pattern that creates an object-oriented class representing each page or screen in the application. This pattern improves test maintainability by separating test logic from UI element locators.
+
+## What is the Page Object Model?
+
+The Page Object Model pattern provides:
+
+- **Encapsulation**: UI elements and interactions are defined in one place
+- **Reusability**: Page objects can be used across multiple test cases
+- **Maintainability**: When UI changes, you only update the page object, not every test
+- **Readability**: Tests become more readable with descriptive method names
+
+## ResumePage implementation
+
+The `ResumePage` class represents the main resume screen in the OI Resume App:
+
+```swift OI_PortfolioUITests/Pages/portfolioPage.swift
+import XCTest
+
+class ResumePage {
+
+    let app: XCUIApplication
+
+    init(app: XCUIApplication) {
+        self.app = app
+    }
+
+    // Elements
+    var authorName: XCUIElement {
+        return app.staticTexts["Olawale Ibitoye"]
+    }
+    
+    var skillsChevronButton: XCUIElement {
+        return app.buttons.matching(identifier: "Go Up").element(boundBy: 0)
+    }
+    
+    var experienceChevronButton: XCUIElement {
+        return app.buttons.matching(identifier: "Go Up").element(boundBy: 1)
+    }
+    
+    var mobileText: XCUIElement {
+        return app.staticTexts["Mobile"]
+    }
+    
+    var jobText: XCUIElement {
+        return app.staticTexts["INIT Creative"]
+    }
+
+    // Actions
+    func verifyAuthorNameExists() {
+        XCTAssertTrue(authorName.exists, "The author's name should exist")
+    }
+
+    func toggleSkillsSection() {
+        XCTAssertTrue(skillsChevronButton.exists, "The skills chevron button should exist")
+        skillsChevronButton.tap()
+    }
+
+    func verifySkillsVisibility(shouldExist: Bool) {
+        if shouldExist {
+            XCTAssertTrue(mobileText.exists, "The mobile and other skills should be visible")
+        } else {
+            XCTAssertFalse(mobileText.exists, "The mobile and other skills should not be visible")
+        }
+    }
+
+    func toggleExperienceSection() {
+        XCTAssertTrue(experienceChevronButton.exists, "The experience chevron button should exist")
+        experienceChevronButton.tap()
+    }
+
+    func verifyExperienceVisibility(shouldExist: Bool) {
+        if shouldExist {
+            XCTAssertTrue(jobText.exists, "Creative and other experiences should be visible")
+        } else {
+            XCTAssertFalse(jobText.exists, "Creative and other experiences should not be visible")
+        }
+    }
+}
+```
+
+## Structure breakdown
+
+### Initialization
+
+```swift
+let app: XCUIApplication
+
+init(app: XCUIApplication) {
+    self.app = app
+}
+```
+
+The page object stores a reference to the `XCUIApplication` instance, allowing it to query and interact with UI elements.
+
+### Elements section
+
+UI elements are defined as computed properties that return `XCUIElement` objects:
+
+<CodeGroup>
+```swift Static text elements
+var authorName: XCUIElement {
+    return app.staticTexts["Olawale Ibitoye"]
+}
+
+var mobileText: XCUIElement {
+    return app.staticTexts["Mobile"]
+}
+
+var jobText: XCUIElement {
+    return app.staticTexts["INIT Creative"]
+}
+```
+
+```swift Button elements
+var skillsChevronButton: XCUIElement {
+    return app.buttons.matching(identifier: "Go Up").element(boundBy: 0)
+}
+
+var experienceChevronButton: XCUIElement {
+    return app.buttons.matching(identifier: "Go Up").element(boundBy: 1)
+}
+```
+</CodeGroup>
+
+<Note>
+**Element indexing**: When multiple buttons share the same identifier ("Go Up"), `element(boundBy:)` is used to select specific instances. Index 0 refers to the skills chevron, and index 1 refers to the experience chevron.
+</Note>
+
+### Actions section
+
+Action methods encapsulate interactions and assertions:
+
+<Tabs>
+  <Tab title="Verification actions">
+    ```swift
+    func verifyAuthorNameExists() {
+        XCTAssertTrue(authorName.exists, "The author's name should exist")
+    }
+    
+    func verifySkillsVisibility(shouldExist: Bool) {
+        if shouldExist {
+            XCTAssertTrue(mobileText.exists, "The mobile and other skills should be visible")
+        } else {
+            XCTAssertFalse(mobileText.exists, "The mobile and other skills should not be visible")
+        }
+    }
+    ```
+  </Tab>
+  
+  <Tab title="Interaction actions">
+    ```swift
+    func toggleSkillsSection() {
+        XCTAssertTrue(skillsChevronButton.exists, "The skills chevron button should exist")
+        skillsChevronButton.tap()
+    }
+    
+    func toggleExperienceSection() {
+        XCTAssertTrue(experienceChevronButton.exists, "The experience chevron button should exist")
+        experienceChevronButton.tap()
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Benefits in practice
+
+### Before Page Object Model
+
+```swift
+// Test code is tightly coupled to UI implementation
+func testResume() {
+    let authorName = app.staticTexts["Olawale Ibitoye"]
+    XCTAssertTrue(authorName.exists)
+    
+    let skillsButton = app.buttons.matching(identifier: "Go Up").element(boundBy: 0)
+    skillsButton.tap()
+    
+    let mobileText = app.staticTexts["Mobile"]
+    XCTAssertFalse(mobileText.exists)
+}
+```
+
+### After Page Object Model
+
+```swift
+// Test code is clean and focused on behavior
+func testResumePage() {
+    let resumePage = ResumePage(app: app)
+    
+    resumePage.verifyAuthorNameExists()
+    resumePage.toggleSkillsSection()
+    resumePage.verifySkillsVisibility(shouldExist: false)
+}
+```
+
+<Check>
+The Page Object Model makes tests more readable and maintainable. If the UI changes (e.g., button identifier changes from "Go Up" to "Chevron"), you only need to update the `ResumePage` class, not every test that uses it.
+</Check>
+
+## Element locator strategies
+
+The `ResumePage` uses several XCUITest locator strategies:
+
+| Strategy | Example | Use case |
+|----------|---------|----------|
+| **Static text by label** | `app.staticTexts["Olawale Ibitoye"]` | Locate text elements by their displayed content |
+| **Button by identifier** | `app.buttons.matching(identifier: "Go Up")` | Locate buttons by accessibility identifier |
+| **Element by index** | `.element(boundBy: 0)` | Select specific element when multiple matches exist |
+
+<Warning>
+Using displayed text (like "Olawale Ibitoye") as a locator can be fragile if the text changes. Consider using accessibility identifiers instead for more robust tests.
+</Warning>
+
+## Best practices
+
+<Steps>
+  <Step title="Use descriptive property names">
+    Element properties should clearly describe what they represent (e.g., `authorName`, not `text1`).
+  </Step>
+  
+  <Step title="Separate elements from actions">
+    Keep element definitions and action methods in distinct sections for clarity.
+  </Step>
+  
+  <Step title="Include assertions in actions">
+    Action methods can include relevant assertions (e.g., verifying a button exists before tapping it).
+  </Step>
+  
+  <Step title="Make actions reusable">
+    Design action methods to be flexible with parameters like `shouldExist: Bool` for verification methods.
+  </Step>
+</Steps>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Test cases" icon="check-circle" href="/testing/test-cases">
+    See how the ResumePage is used in actual test scenarios
+  </Card>
+  <Card title="Running tests" icon="play" href="/testing/running-tests">
+    Learn how to execute the test suite in Xcode
+  </Card>
+</CardGroup>

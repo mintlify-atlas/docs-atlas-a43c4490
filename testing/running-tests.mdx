@@ -1,0 +1,389 @@
+---
+title: Running tests
+description: Step-by-step guide to executing UI tests in Xcode for the OI Resume App
+---
+
+This guide covers how to run the XCUITest suite in Xcode, interpret test results, and troubleshoot common issues.
+
+## Prerequisites
+
+Before running tests, ensure you have:
+
+<CardGroup cols={2}>
+  <Card title="Xcode installed" icon="apple">
+    Xcode 14.0 or later with Swift support
+  </Card>
+  <Card title="Project opened" icon="folder-open">
+    OI_Portfolio.xcodeproj opened in Xcode
+  </Card>
+  <Card title="Simulator/device" icon="mobile">
+    iOS simulator or physical device available
+  </Card>
+  <Card title="Test target" icon="bullseye">
+    OI_PortfolioUITests target included in scheme
+  </Card>
+</CardGroup>
+
+## Running tests in Xcode
+
+<Steps>
+  <Step title="Select test scheme">
+    In Xcode, click the scheme selector (near the play/stop buttons) and ensure the **OI_Portfolio** scheme is selected.
+  </Step>
+  
+  <Step title="Choose destination">
+    Select a simulator or connected device from the destination menu (e.g., "iPhone 15 Pro" or "Any iOS Device").
+    
+    <Note>
+    UI tests can run on both simulators and physical devices. Simulators are faster and don't require device provisioning.
+    </Note>
+  </Step>
+  
+  <Step title="Open Test Navigator">
+    Press **⌘ + 6** or click the Test Navigator icon (diamond shape) in the left sidebar.
+    
+    You'll see the test hierarchy:
+    ```
+    OI_PortfolioUITests
+      └── OI_ResumeTests
+            └── testResumePage()
+    ```
+  </Step>
+  
+  <Step title="Run tests">
+    You have several options:
+    
+    <Tabs>
+      <Tab title="Run all tests">
+        Press **⌘ + U** or select **Product → Test** from the menu bar.
+        
+        This runs all test targets (including `OI_PortfolioUITests`).
+      </Tab>
+      
+      <Tab title="Run specific test class">
+        Hover over `OI_ResumeTests` in the Test Navigator and click the play button that appears.
+        
+        This runs all tests in the `OI_ResumeTests` class.
+      </Tab>
+      
+      <Tab title="Run single test method">
+        Hover over `testResumePage()` in the Test Navigator and click the play button.
+        
+        This runs only the `testResumePage()` test.
+      </Tab>
+      
+      <Tab title="Run from editor">
+        Open `OI_PortfolioUITests.swift` and click the diamond icon in the gutter next to the test method.
+        
+        ```swift
+        func testResumePage() throws { // <- Click diamond here
+            // Test code
+        }
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+  
+  <Step title="Monitor test execution">
+    Watch the test progress:
+    
+    - The simulator/device will launch automatically
+    - You'll see the app UI interact automatically (buttons tapping, sections collapsing)
+    - Test Navigator shows real-time status with checkmarks (✓) or X marks (✗)
+    - Build output appears in the Report Navigator (⌘ + 9)
+  </Step>
+</Steps>
+
+## Test execution flow
+
+When you run `testResumePage()`, the following happens:
+
+```mermaid
+sequence
+    participant Xcode
+    participant BaseTest
+    participant App
+    participant Test
+    
+    Xcode->>BaseTest: setUpWithError()
+    BaseTest->>App: launch()
+    App-->>BaseTest: App launched
+    BaseTest->>Test: Run testResumePage()
+    Test->>App: Verify author name
+    Test->>App: Toggle skills section
+    Test->>App: Toggle experience section
+    Test-->>BaseTest: Test complete
+    BaseTest->>App: tearDownWithError()
+    BaseTest->>App: terminate()
+    BaseTest-->>Xcode: Cleanup complete
+```
+
+## Reading test results
+
+### Successful test
+
+When all assertions pass:
+
+```
+Test Case '-[OI_PortfolioUITests.OI_ResumeTests testResumePage]' started.
+Test Case '-[OI_PortfolioUITests.OI_ResumeTests testResumePage]' passed (5.234 seconds).
+```
+
+<Check>
+Green checkmarks appear next to passed tests in the Test Navigator.
+</Check>
+
+### Failed test
+
+If an assertion fails:
+
+```
+Test Case '-[OI_PortfolioUITests.OI_ResumeTests testResumePage]' started.
+/path/to/portfolioPage.swift:41: error: -[OI_ResumeTests testResumePage] : 
+XCTAssertTrue failed - The author's name should exist
+Test Case '-[OI_PortfolioUITests.OI_ResumeTests testResumePage]' failed (2.103 seconds).
+```
+
+The failure shows:
+- **File and line number**: `portfolioPage.swift:41`
+- **Failed assertion**: `XCTAssertTrue failed`
+- **Failure message**: "The author's name should exist"
+
+<Warning>
+Since `continueAfterFailure = false` is set in `OIBaseTest`, the test stops at the first failure.
+</Warning>
+
+## Using the Test Plan
+
+The project includes a test plan configuration:
+
+```json OI_Portfolio.xctestplan
+{
+  "configurations" : [
+    {
+      "id" : "F85DF1FB-F700-413E-A022-C422F24FFA38",
+      "name" : "Test Scheme Action",
+      "options" : {}
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:OI_Portfolio.xcodeproj",
+      "identifier" : "3D8009F02C7F26A700015444",
+      "name" : "OI_Portfolio"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:OI_Portfolio.xcodeproj",
+        "identifier" : "3D2F95E02C85D94A00422269",
+        "name" : "OI_PortfolioUITests"
+      }
+    }
+  ],
+  "version" : 1
+}
+```
+
+### Key configuration
+
+- **Parallelizable**: `true` allows tests to run in parallel (when multiple tests exist)
+- **Test target**: Specifies `OI_PortfolioUITests` as the active UI test target
+- **Default options**: Sets `OI_Portfolio` as the app target for variable expansion
+
+<Tip>
+To edit the test plan, select **Product → Scheme → Edit Scheme → Test** and click on the test plan file.
+</Tip>
+
+## Command line testing
+
+You can also run tests from the terminal using `xcodebuild`:
+
+<CodeGroup>
+```bash Run all UI tests
+xcodebuild test \
+  -project OI_Portfolio.xcodeproj \
+  -scheme OI_Portfolio \
+  -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+  -only-testing:OI_PortfolioUITests
+```
+
+```bash Run specific test
+xcodebuild test \
+  -project OI_Portfolio.xcodeproj \
+  -scheme OI_Portfolio \
+  -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+  -only-testing:OI_PortfolioUITests/OI_ResumeTests/testResumePage
+```
+
+```bash List available simulators
+xcrun simctl list devices available
+```
+</CodeGroup>
+
+<Note>
+Replace `iPhone 15 Pro` with your preferred simulator. Use `xcrun simctl list` to see available options.
+</Note>
+
+## Debugging test failures
+
+<AccordionGroup>
+  <Accordion title="Element not found" icon="magnifying-glass">
+    **Error**: `XCTAssertTrue failed - The skills chevron button should exist`
+    
+    **Possible causes**:
+    - UI element hasn't finished rendering
+    - Accessibility identifier changed
+    - Element is off-screen or obscured
+    
+    **Solutions**:
+    - Add wait conditions: `XCTAssertTrue(element.waitForExistence(timeout: 5))`
+    - Verify accessibility identifiers in the app code
+    - Use Xcode's Accessibility Inspector to debug element hierarchy
+  </Accordion>
+  
+  <Accordion title="Test timeout" icon="clock">
+    **Error**: Test exceeds default timeout (usually 10 seconds per action)
+    
+    **Possible causes**:
+    - App is slow to launch
+    - Animation delays
+    - Network requests blocking UI
+    
+    **Solutions**:
+    - Increase timeout in test plan settings
+    - Use `XCUIElement.waitForExistence(timeout:)` for specific elements
+    - Mock network requests in UI tests
+  </Accordion>
+  
+  <Accordion title="App doesn't launch" icon="rocket">
+    **Error**: App fails to launch or crashes immediately
+    
+    **Possible causes**:
+    - Build failures
+    - Simulator issues
+    - Code signing problems (on device)
+    
+    **Solutions**:
+    - Clean build folder: **Product → Clean Build Folder** (⇧ + ⌘ + K)
+    - Reset simulator: **Device → Erase All Content and Settings**
+    - Check scheme settings: Ensure test target has proper app dependency
+  </Accordion>
+  
+  <Accordion title="Wrong element selected" icon="mouse-pointer">
+    **Error**: Test taps wrong button or finds wrong text
+    
+    **Possible causes**:
+    - Multiple elements with same identifier
+    - Index changed due to UI modifications
+    
+    **Solutions**:
+    - Use more specific identifiers
+    - Update `element(boundBy:)` indices
+    - Use Accessibility Inspector to verify element hierarchy
+    - Consider using `firstMatch` or more specific queries
+  </Accordion>
+</AccordionGroup>
+
+## Viewing test reports
+
+<Steps>
+  <Step title="Open Report Navigator">
+    Press **⌘ + 9** to open the Report Navigator.
+  </Step>
+  
+  <Step title="Select test run">
+    Click on the latest test execution in the list.
+  </Step>
+  
+  <Step title="Expand test details">
+    Click the disclosure triangles to see:
+    - Individual test results
+    - Assertion failures with file/line numbers
+    - Performance metrics
+    - Screenshots (if capture is enabled)
+  </Step>
+  
+  <Step title="Export reports (optional)">
+    Right-click the test run and select **Export** to save results in various formats.
+  </Step>
+</Steps>
+
+## Test recording
+
+Xcode can record your interactions to generate UI test code:
+
+<Steps>
+  <Step title="Place cursor in test method">
+    Open `OI_PortfolioUITests.swift` and place cursor inside a test method.
+  </Step>
+  
+  <Step title="Start recording">
+    Click the red record button at the bottom of the editor window.
+  </Step>
+  
+  <Step title="Interact with app">
+    Xcode launches the app. Interact with UI elements (tap buttons, enter text, etc.).
+  </Step>
+  
+  <Step title="Stop recording">
+    Click the record button again. Xcode generates code for your interactions.
+  </Step>
+</Steps>
+
+<Warning>
+Recorded code often needs refinement. Use it as a starting point, then refactor with the Page Object Model pattern.
+</Warning>
+
+## Continuous integration
+
+For CI/CD pipelines, use `xcodebuild` with result bundles:
+
+```bash
+xcodebuild test \
+  -project OI_Portfolio.xcodeproj \
+  -scheme OI_Portfolio \
+  -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+  -resultBundlePath ./test-results.xcresult
+```
+
+Result bundles can be:
+- Opened in Xcode for detailed analysis
+- Parsed by CI tools for test reporting
+- Archived for historical comparison
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Run tests frequently" icon="rotate">
+    Run tests after every significant change to catch regressions early
+  </Card>
+  <Card title="Use simulators for speed" icon="gauge-high">
+    Simulators are faster than physical devices for most testing scenarios
+  </Card>
+  <Card title="Clean build periodically" icon="broom">
+    Clear build artifacts if tests behave inconsistently
+  </Card>
+  <Card title="Reset simulators" icon="arrow-rotate-left">
+    Reset simulator state between test runs to avoid state pollution
+  </Card>
+</CardGroup>
+
+## Keyboard shortcuts
+
+| Action | Shortcut |
+|--------|----------|
+| Run all tests | **⌘ + U** |
+| Run last test | **⌃ + ⌥ + ⌘ + G** |
+| Show Test Navigator | **⌘ + 6** |
+| Show Report Navigator | **⌘ + 9** |
+| Clean build folder | **⇧ + ⌘ + K** |
+| Build for testing | **⇧ + ⌘ + U** |
+
+## Next steps
+
+<Card title="Back to overview" icon="arrow-left" href="/testing/overview">
+  Return to the testing overview to explore other aspects of the test suite
+</Card>

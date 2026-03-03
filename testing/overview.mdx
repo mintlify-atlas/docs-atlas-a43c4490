@@ -1,0 +1,133 @@
+---
+title: Testing overview
+description: Comprehensive guide to the XCUITest implementation for the OI Resume App
+---
+
+The OI Resume App uses **XCUITest**, Apple's native UI testing framework, to ensure the reliability and quality of the SwiftUI application. This testing suite validates user interactions, UI element visibility, and navigation flows.
+
+## Testing architecture
+
+The test implementation follows industry best practices:
+
+- **XCUITest Framework**: Apple's native UI testing framework for iOS applications
+- **Page Object Model (POM)**: Encapsulates UI elements and actions into reusable page objects
+- **Base Test Class**: Provides common setup and teardown logic for all tests
+- **Modular Structure**: Separates test logic, page objects, and base configuration
+
+## Project structure
+
+```
+OI_PortfolioUITests/
+├── OIBaseTest/
+│   └── OIBase.swift          # Base test class with setup/teardown
+├── Pages/
+│   └── portfolioPage.swift   # Page Object Model for resume page
+└── OITest/
+    └── OI_PortfolioUITests.swift  # Test cases
+```
+
+## Key components
+
+<CardGroup cols={2}>
+  <Card title="Base test class" icon="flask" href="#base-test-class">
+    Common setup and teardown logic for all UI tests
+  </Card>
+  <Card title="Page Object Model" icon="file-code" href="/testing/page-object-model">
+    Encapsulation of UI elements and actions
+  </Card>
+  <Card title="Test cases" icon="check-circle" href="/testing/test-cases">
+    Comprehensive test scenarios for the resume app
+  </Card>
+  <Card title="Running tests" icon="play" href="/testing/running-tests">
+    How to execute tests in Xcode
+  </Card>
+</CardGroup>
+
+## Base test class
+
+The `OIBaseTest` class provides common functionality for all UI tests:
+
+```swift OI_PortfolioUITests/OIBaseTest/OIBase.swift
+import Foundation
+import XCTest
+
+class OIBaseTest: XCTestCase {
+    let app = XCUIApplication()
+    
+    override func setUpWithError() throws {
+        super.setUp()
+        continueAfterFailure = false
+        app.launch()
+        
+    }
+
+    override func tearDownWithError() throws {
+        super.tearDown()
+        app.terminate()
+        
+    }
+}
+```
+
+### Key features
+
+- **XCUIApplication Instance**: Shared app instance available to all test subclasses
+- **Setup**: Launches the app before each test and disables continuation after failures
+- **Teardown**: Terminates the app after each test to ensure clean state
+- **Inheritance**: All test classes inherit from `OIBaseTest` for consistent behavior
+
+<Note>
+Setting `continueAfterFailure = false` ensures that tests stop immediately when an assertion fails, making it easier to identify and debug issues.
+</Note>
+
+## Test coverage
+
+The current test suite covers:
+
+- Author name verification
+- Skills section toggle functionality
+- Experience section toggle functionality
+- UI element visibility validation
+- Interactive chevron button behavior
+
+## Benefits of XCUITest
+
+<AccordionGroup>
+  <Accordion title="Native integration">
+    XCUITest is built by Apple and integrates seamlessly with Xcode, Swift, and iOS development workflows.
+  </Accordion>
+  
+  <Accordion title="Real device testing">
+    Tests can run on simulators and real devices, ensuring compatibility across different iOS versions and device types.
+  </Accordion>
+  
+  <Accordion title="Accessibility-first">
+    XCUITest leverages accessibility identifiers and labels, which improves both testability and app accessibility.
+  </Accordion>
+  
+  <Accordion title="Swift language support">
+    Tests are written in Swift, allowing developers to use the same language for both app code and tests.
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<Steps>
+  <Step title="Understand the Page Object Model">
+    Learn how the `ResumePage` class encapsulates UI elements and actions.
+    
+    [Page Object Model](/testing/page-object-model)
+  </Step>
+  
+  <Step title="Review test cases">
+    Explore the actual test scenarios implemented for the resume app.
+    
+    [Test cases](/testing/test-cases)
+  </Step>
+  
+  <Step title="Run the tests">
+    Execute the test suite in Xcode and interpret the results.
+    
+    [Running tests](/testing/running-tests)
+  </Step>
+</Steps>

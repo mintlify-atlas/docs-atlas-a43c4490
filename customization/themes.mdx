@@ -1,0 +1,212 @@
+---
+title: Customize themes
+description: Configure colors, dark mode support, and visual themes in your OI Resume App
+---
+
+The OI Resume App supports both light and dark modes automatically using SwiftUI's adaptive color system and includes utilities for custom hex-based colors.
+
+## Dark mode support
+
+The app automatically adapts to the system's color scheme preference using SwiftUI's `Color(UIColor.systemBackground)` API.
+
+### How it works
+
+From `PortfolioView.swift:16`, the background adapts to the current color scheme:
+
+```swift
+ZStack {
+    Color(UIColor.systemBackground)
+        .ignoresSafeArea()
+    // ... content
+}
+```
+
+<Tip>
+`UIColor.systemBackground` automatically switches between light and dark colors based on the system appearance, providing a native iOS experience.
+</Tip>
+
+### Testing dark mode
+
+The preview provider in `PortfolioView.swift` shows how to test dark mode:
+
+```swift
+struct PortfolioView_Previews: PreviewProvider {
+    static var previews: some View {
+        PortfolioView()
+            .colorScheme(.dark)
+    }
+}
+```
+
+<Steps>
+  <Step title="Open preview in Xcode">
+    Select your view file and open the Canvas preview.
+  </Step>
+
+  <Step title="Toggle color scheme">
+    Add `.colorScheme(.dark)` or `.colorScheme(.light)` to test different modes.
+  </Step>
+
+  <Step title="Test on device">
+    Change appearance in Settings > Display & Brightness to verify real-world behavior.
+  </Step>
+</Steps>
+
+## Custom hex colors
+
+The app includes a color extension that allows you to create colors from hex strings, defined in `Extensions/ColorExtensions.swift`.
+
+### Using hex colors
+
+```swift
+// Using the Color extension
+Text("Custom Color")
+    .foregroundColor(Color(hex: "#FF5733"))
+
+// With 8-digit hex (includes alpha)
+Rectangle()
+    .fill(Color(hex: "#FF5733CC"))
+```
+
+### Implementation
+
+The hex color extension from `ColorExtensions.swift`:
+
+<CodeGroup>
+```swift Color Extension
+extension Color {
+    init(hex: String) {
+        self.init(UIColor(hex: hex))
+    }
+}
+```
+
+```swift UIColor Extension
+extension UIColor {
+    convenience init(hex: String) {
+        var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+        hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
+        var rgb: UInt64 = 0
+        var r: CGFloat = 0.0
+        var g: CGFloat = 0.0
+        var b: CGFloat = 0.0
+        var a: CGFloat = 1.0
+        
+        let length = hexSanitized.count
+        Scanner(string: hexSanitized).scanHexInt64(&rgb)
+        
+        if length == 6 {
+            r = CGFloat((rgb & 0xFF0000) >> 16) / 255.0
+            g = CGFloat((rgb & 0x00FF00) >> 8) / 255.0
+            b = CGFloat(rgb & 0x0000FF) / 255.0
+            
+        } else if length == 8 {
+            r = CGFloat((rgb & 0xFF000000) >> 24) / 255.0
+            g = CGFloat((rgb & 0x00FF0000) >> 16) / 255.0
+            b = CGFloat((rgb & 0x0000FF00) >> 8) / 255.0
+            a = CGFloat(rgb & 0x000000FF) / 255.0
+        }
+        self.init(red: r, green: g, blue: b, alpha: a)
+    }
+}
+```
+</CodeGroup>
+
+<Warning>
+The hex color extension supports both 6-digit (#RRGGBB) and 8-digit (#RRGGBBAA) formats. The 8-digit format includes an alpha channel for transparency.
+</Warning>
+
+## Opacity and visual effects
+
+The app uses opacity modifiers to create visual hierarchy and subtle effects:
+
+```swift
+// From HeaderView.swift
+Text(appModel.portfolio.role)
+    .font(Montserrat.mediumItalic.font(size: 18))
+    .opacity(0.85)  // Slightly transparent
+
+HStack {
+    Image(systemName: "location.fill")
+    Text(appModel.portfolio.location)
+}
+.opacity(0.45)  // More transparent for secondary info
+```
+
+### Common opacity patterns
+
+- `1.0` - Fully opaque (primary content)
+- `0.85` - Slightly transparent (secondary text)
+- `0.45-0.50` - Medium transparent (tertiary info)
+- `0.075` - Very transparent (subtle backgrounds)
+
+## Customizing component backgrounds
+
+From `SkillView.swift:29-31`, here's how backgrounds are styled:
+
+```swift
+.background(
+    RoundedRectangle(cornerRadius: 12)
+    .opacity(0.075))
+```
+
+This creates a subtle, rounded background that adapts to both light and dark modes.
+
+<Steps>
+  <Step title="Choose your shape">
+    Select from SwiftUI shapes like `RoundedRectangle`, `Circle`, or `Capsule`.
+  </Step>
+
+  <Step title="Apply opacity">
+    Use low opacity values (0.05-0.1) for subtle backgrounds that work in both modes.
+  </Step>
+
+  <Step title="Add modifiers">
+    Combine with `.shadow()`, `.stroke()`, or other modifiers for enhanced effects.
+  </Step>
+</Steps>
+
+## Creating a custom color scheme
+
+To implement a branded color scheme:
+
+<Steps>
+  <Step title="Define your colors">
+    Create a new Swift file with your color palette:
+    
+    ```swift
+    extension Color {
+        static let brandPrimary = Color(hex: "#007AFF")
+        static let brandSecondary = Color(hex: "#5856D6")
+        static let brandAccent = Color(hex: "#FF9500")
+    }
+    ```
+  </Step>
+
+  <Step title="Use semantic naming">
+    Reference colors by purpose, not appearance:
+    
+    ```swift
+    Text("Important")
+        .foregroundColor(.brandPrimary)
+    ```
+  </Step>
+
+  <Step title="Support adaptive colors">
+    For dark mode support, use `UIColor` with dynamic colors:
+    
+    ```swift
+    extension Color {
+        static let adaptive = Color(UIColor { traitCollection in
+            traitCollection.userInterfaceStyle == .dark 
+                ? UIColor(hex: "#1C1C1E")
+                : UIColor(hex: "#FFFFFF")
+        })
+    }
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+Test your color scheme in both light and dark modes to ensure sufficient contrast and readability in all conditions.
+</Tip>

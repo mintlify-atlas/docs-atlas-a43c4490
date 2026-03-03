@@ -1,0 +1,225 @@
+---
+title: Skills view
+description: Interactive collapsible grid displaying technical skills with smooth animations
+---
+
+## Overview
+
+The `SkillsView` presents a grid of technical skills in a 3-column layout with an interactive collapse/expand animation. Users can toggle the visibility of skills using a chevron button, creating a cleaner interface when needed.
+
+<Note>
+  This component uses SwiftUI's `@State` property wrapper to manage the collapsible state and `withAnimation` for smooth transitions.
+</Note>
+
+## Source code
+
+```swift
+import SwiftUI
+
+struct SkillsView: View {
+    
+    // Variables
+    var skills: [Skill]
+    var width: CGFloat
+    
+    @State var showSkills = true
+    
+    // Views
+    var body: some View {
+        VStack(alignment: .leading) {
+            HStack(spacing: 16) {
+                Text("Skills")
+                    .font(Montserrat.bold.font(size: 21))
+                    .opacity(0.9)
+                
+                Button {
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        showSkills.toggle()
+                    }
+                } label: {
+                    Image(systemName: "chevron.up")
+                        .font(.system(size: 18, weight: .medium))
+                        .rotationEffect(self.showSkills ? .zero : .degrees(180))
+                }.buttonStyle(PlainButtonStyle())
+            }
+            
+            if(showSkills) {
+                LazyVGrid(columns: [GridItem(), GridItem(), GridItem()], alignment: .leading, spacing: 12) {
+                    ForEach(skills) {skill in
+                        SkillView(skill: skill, width: width / 3 - 24)
+                    }
+                }.padding(.top, 38)
+            }
+        }
+    }
+}
+```
+
+## Properties
+
+<ParamField path="skills" type="[Skill]" required>
+  Array of Skill objects to display in the grid. Each skill is rendered as an individual SkillView component.
+</ParamField>
+
+<ParamField path="width" type="CGFloat" required>
+  Total width available for the grid layout. Used to calculate individual skill cell widths based on the 3-column layout.
+</ParamField>
+
+<ParamField path="showSkills" type="@State Bool" default="true">
+  State variable controlling the visibility of the skills grid. Initialized to `true`, showing skills by default.
+</ParamField>
+
+## Interactive features
+
+### Collapsible animation
+
+The view implements a smooth collapse/expand animation:
+
+```swift
+Button {
+    withAnimation(.easeInOut(duration: 0.4)) {
+        showSkills.toggle()
+    }
+} label: {
+    Image(systemName: "chevron.up")
+        .font(.system(size: 18, weight: .medium))
+        .rotationEffect(self.showSkills ? .zero : .degrees(180))
+}.buttonStyle(PlainButtonStyle())
+```
+
+<ParamField path="animation" type="easeInOut">
+  - **Duration**: 0.4 seconds
+  - **Type**: Ease in/out for smooth acceleration and deceleration
+  - **Effect**: Creates a natural, polished transition
+</ParamField>
+
+### Chevron rotation
+
+<ParamField path="rotationEffect" type="Angle">
+  - **Expanded state**: 0 degrees (chevron points up)
+  - **Collapsed state**: 180 degrees (chevron points down)
+  - **Transition**: Animated automatically with the state change
+</ParamField>
+
+<Tip>
+  The chevron rotation provides immediate visual feedback about the current state and the available action (expand or collapse).
+</Tip>
+
+## Layout structure
+
+### Header section
+
+```swift
+HStack(spacing: 16) {
+    Text("Skills")
+        .font(Montserrat.bold.font(size: 21))
+        .opacity(0.9)
+    
+    Button { ... } label: { ... }
+}
+```
+
+- **Section title**: "Skills" in Montserrat Bold, 21pt
+- **Title opacity**: 0.9 for subtle softening
+- **Spacing**: 16pt between title and button
+
+### Grid layout
+
+```swift
+LazyVGrid(columns: [GridItem(), GridItem(), GridItem()], alignment: .leading, spacing: 12) {
+    ForEach(skills) {skill in
+        SkillView(skill: skill, width: width / 3 - 24)
+    }
+}.padding(.top, 38)
+```
+
+<ParamField path="columns" type="[GridItem]">
+  Three flexible GridItem columns for a responsive 3-column layout.
+</ParamField>
+
+<ParamField path="alignment" type=".leading">
+  Left-aligns grid items for consistent visual flow.
+</ParamField>
+
+<ParamField path="spacing" type="CGFloat" default="12">
+  12pt spacing between grid items (both horizontal and vertical).
+</ParamField>
+
+### Width calculation
+
+```swift
+width: width / 3 - 24
+```
+
+Each skill cell width is calculated as:
+- Total available width divided by 3 (for 3 columns)
+- Minus 24pt to account for padding and spacing
+
+<Note>
+  The width calculation ensures skills are evenly distributed across the available space while maintaining proper margins.
+</Note>
+
+## Conditional rendering
+
+```swift
+if(showSkills) {
+    LazyVGrid(...) {
+        ...
+    }.padding(.top, 38)
+}
+```
+
+The grid only renders when `showSkills` is `true`, reducing memory usage and improving performance when collapsed.
+
+<ParamField path="topPadding" type="CGFloat" default="38">
+  38pt spacing between the header and the skills grid when expanded.
+</ParamField>
+
+## Animation behavior
+
+When the user taps the chevron button:
+
+1. **Button tapped**: Toggle action triggers
+2. **Animation starts**: 0.4-second ease in/out animation begins
+3. **State updates**: `showSkills` toggles between true/false
+4. **Visual changes**:
+   - Chevron rotates 180 degrees
+   - Grid appears/disappears with fade effect
+   - Layout adjusts smoothly
+
+<Tip>
+  Using `withAnimation` wraps the state change, ensuring all dependent views animate automatically without explicit transition modifiers.
+</Tip>
+
+## Preview configuration
+
+```swift
+struct SkillsView_Previews: PreviewProvider {
+    static var previews: some View {
+        GeometryReader { proxy in
+            SkillsView(skills: AppModel().portfolio.skills, width: 400)
+                .padding (24)
+        }
+    }
+}
+```
+
+The preview uses:
+- Sample data from `AppModel().portfolio.skills`
+- Fixed width of 400pt for consistent preview
+- 24pt padding for proper spacing visualization
+
+## Usage example
+
+```swift
+SkillsView(
+    skills: appModel.portfolio.skills,
+    width: UIScreen.main.bounds.width + 5
+)
+.padding(.top, 32)
+```
+
+Typically used in PortfolioView with:
+- Skills data from the app model
+- Screen width calculation for responsive sizing
+- 32pt top margin for section separation

@@ -1,0 +1,243 @@
+---
+title: Installation
+description: Set up your development environment to build and run the OI Resume App
+---
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed on your macOS system:
+
+<CardGroup cols={2}>
+  <Card title="macOS" icon="apple">
+    macOS 12.0 (Monterey) or later
+  </Card>
+  <Card title="Xcode" icon="hammer">
+    Xcode 14.0 or later with iOS SDK
+  </Card>
+  <Card title="Git" icon="git-alt">
+    For cloning the repository
+  </Card>
+  <Card title="iOS Simulator" icon="mobile-screen">
+    Included with Xcode for testing
+  </Card>
+</CardGroup>
+
+<Note>
+  The OI Resume App requires iOS 14.0 or later as the deployment target.
+</Note>
+
+## Install Xcode
+
+<Steps>
+  <Step title="Download Xcode">
+    Download Xcode from the Mac App Store or from [Apple's Developer website](https://developer.apple.com/xcode/).
+    
+    ```bash
+    # Or install via command line (requires Apple ID)
+    xcode-select --install
+    ```
+  </Step>
+
+  <Step title="Verify installation">
+    After installation, verify Xcode is properly configured:
+    
+    ```bash
+    xcode-select -p
+    # Should output: /Applications/Xcode.app/Contents/Developer
+    
+    swift --version
+    # Should show Swift version 5.x or later
+    ```
+  </Step>
+
+  <Step title="Accept license agreement">
+    Accept the Xcode license agreement:
+    
+    ```bash
+    sudo xcodebuild -license accept
+    ```
+  </Step>
+</Steps>
+
+## Install Git
+
+Git is required to clone the repository. Check if it's already installed:
+
+```bash
+git --version
+```
+
+If Git is not installed, you can install it via Homebrew:
+
+```bash
+# Install Homebrew if you don't have it
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install Git
+brew install git
+```
+
+## Clone the repository
+
+Once you have the prerequisites installed, clone the OI Resume App repository:
+
+```bash
+# Clone the repository
+git clone https://github.com/olaeben/Resume-App.git
+
+# Navigate to the project directory
+cd Resume-App
+```
+
+<Note>
+  Replace the repository URL with your actual repository URL if you've forked the project.
+</Note>
+
+## Project structure
+
+After cloning, you'll see the following structure:
+
+```
+Resume-App/
+├── OI_Portfolio/               # Main application code
+│   ├── Code/
+│   │   ├── Controllers/        # App entry point
+│   │   ├── Models/             # Data models
+│   │   ├── Services/           # Business logic
+│   │   └── Views/              # SwiftUI views
+│   ├── Extensions/             # Swift extensions
+│   ├── Utilities/              # Helper utilities
+│   └── Assets.xcassets/        # Images and colors
+├── OI_Portfolio.xcodeproj/     # Xcode project file
+├── OI_PortfolioTests/          # Unit tests
+├── OI_PortfolioUITests/        # UI tests (XCUITest)
+└── README.md                   # Project documentation
+```
+
+## Open in Xcode
+
+<Steps>
+  <Step title="Open the project">
+    Open the Xcode project file:
+    
+    ```bash
+    open OI_Portfolio.xcodeproj
+    ```
+    
+    Alternatively, you can:
+    - Double-click `OI_Portfolio.xcodeproj` in Finder
+    - Open Xcode and select "Open a project or file"
+  </Step>
+
+  <Step title="Wait for indexing">
+    When you first open the project, Xcode will index all files. Wait for this process to complete (you'll see a progress indicator in the top center of the Xcode window).
+  </Step>
+
+  <Step title="Select a simulator">
+    In the Xcode toolbar, click on the device selector (next to the Run/Stop buttons) and choose an iOS simulator:
+    
+    - iPhone 14 Pro (recommended)
+    - iPhone 15
+    - iPad Pro 12.9-inch
+    - Or any other iOS device
+  </Step>
+</Steps>
+
+## Verify dependencies
+
+The OI Resume App has minimal external dependencies. However, ensure the custom Montserrat fonts are properly included:
+
+<Steps>
+  <Step title="Check font files">
+    In Xcode's Project Navigator, verify that the font files are present in the project:
+    
+    - Montserrat-Thin.ttf
+    - Montserrat-Regular.ttf
+    - Montserrat-Medium.ttf
+    - Montserrat-SemiBold.ttf
+    - Montserrat-Bold.ttf
+    - And their italic variants
+  </Step>
+
+  <Step title="Verify Info.plist">
+    Check that the fonts are registered in `OI-Portfolio-Info.plist`:
+    
+    ```xml
+    <key>UIAppFonts</key>
+    <array>
+        <string>Montserrat-Thin.ttf</string>
+        <string>Montserrat-Regular.ttf</string>
+        <string>Montserrat-Medium.ttf</string>
+        <string>Montserrat-SemiBold.ttf</string>
+        <string>Montserrat-Bold.ttf</string>
+        <!-- ... other font variants -->
+    </array>
+    ```
+  </Step>
+</Steps>
+
+## Build configuration
+
+The project comes with default build configurations. You can verify them in Xcode:
+
+1. Select the project in the Project Navigator
+2. Select the "OI_Portfolio" target
+3. Go to the "Build Settings" tab
+
+Key settings:
+- **iOS Deployment Target**: iOS 14.0
+- **Swift Language Version**: Swift 5.x
+- **Product Name**: OI_Portfolio
+
+<Warning>
+  If you encounter code signing issues, you may need to select your Apple Developer team in the "Signing & Capabilities" tab.
+</Warning>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Command Line Tools not found">
+    If you get an error about Command Line Tools:
+    
+    ```bash
+    xcode-select --install
+    sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+    ```
+  </Accordion>
+
+  <Accordion title="Fonts not loading">
+    If custom fonts don't appear:
+    
+    1. Verify font files are in the Xcode project
+    2. Check that they're included in the target membership
+    3. Confirm they're listed in Info.plist under `UIAppFonts`
+    4. Clean build folder: Product → Clean Build Folder (Cmd+Shift+K)
+  </Accordion>
+
+  <Accordion title="Simulator not appearing">
+    If iOS Simulators don't appear in the device selector:
+    
+    ```bash
+    # Open Xcode and install iOS simulators
+    open -a Simulator
+    
+    # Or install via command line
+    xcodebuild -downloadPlatform iOS
+    ```
+  </Accordion>
+
+  <Accordion title="Build fails with signing errors">
+    For code signing issues:
+    
+    1. Go to project settings → Signing & Capabilities
+    2. Check "Automatically manage signing"
+    3. Select your Apple Developer team
+    4. Or change the bundle identifier to something unique
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<Card title="Continue to Quick start" icon="rocket" href="/quickstart">
+  Learn how to build, run, and customize the OI Resume App
+</Card>

@@ -1,0 +1,310 @@
+---
+title: Data models
+description: Data structures that define the portfolio information including skills, experience, and personal details
+---
+
+## Overview
+
+The OI Resume App uses three core data models defined in `Code/Models/Portfolio.swift`. These models are simple Swift structs that conform to the `Identifiable` protocol where needed for SwiftUI list rendering.
+
+<Note>
+All data models are value types (structs) rather than reference types (classes), following Swift best practices for immutable data.
+</Note>
+
+## Portfolio struct
+
+The main data structure that contains all portfolio information.
+
+### Definition
+
+```swift Code/Models/Portfolio.swift
+struct Portfolio {
+    let name: String
+    let role: String
+    let description: String
+    let linkedin: String
+    let github: String
+    let location: String
+    let skills: [Skill]
+    let experience: [Experience]
+}
+```
+
+### Properties
+
+<ParamField path="name" type="String">
+  Full name of the portfolio owner
+</ParamField>
+
+<ParamField path="role" type="String">
+  Professional title or current role
+</ParamField>
+
+<ParamField path="description" type="String">
+  Brief professional summary or bio
+</ParamField>
+
+<ParamField path="linkedin" type="String">
+  LinkedIn username (not full URL)
+</ParamField>
+
+<ParamField path="github" type="String">
+  GitHub username (not full URL)
+</ParamField>
+
+<ParamField path="location" type="String">
+  Current location or region
+</ParamField>
+
+<ParamField path="skills" type="[Skill]">
+  Array of professional skills
+</ParamField>
+
+<ParamField path="experience" type="[Experience]">
+  Array of work experience entries
+</ParamField>
+
+### Usage example
+
+```swift
+let portfolio = Portfolio(
+    name: "Olawale Ibitoye",
+    role: "QA Engineer",
+    description: "Experienced Tester with a profound passion for Technology.",
+    linkedin: "olawale-ibitoye",
+    github: "olaeben",
+    location: "United Kingdom",
+    skills: [...],
+    experience: [...]
+)
+```
+
+## Skill struct
+
+Represents a professional skill with an icon.
+
+### Definition
+
+```swift Code/Models/Portfolio.swift
+struct Skill: Identifiable {
+    var id: String
+    let skillName: String
+    let image: String
+}
+```
+
+### Properties
+
+<ParamField path="id" type="String" required>
+  Unique identifier for the skill (typically a UUID string)
+</ParamField>
+
+<ParamField path="skillName" type="String" required>
+  Display name of the skill (e.g., "Mobile", "API", "Automation")
+</ParamField>
+
+<ParamField path="image" type="String" required>
+  SF Symbol name for the skill icon (e.g., "iphone", "laptopcomputer")
+</ParamField>
+
+### Identifiable conformance
+
+<Info>
+The `Identifiable` protocol allows SwiftUI to efficiently render lists of skills using `ForEach` without explicitly providing an `id` parameter.
+</Info>
+
+### Usage example
+
+```swift
+let skills = [
+    Skill(id: UUID().uuidString, skillName: "Mobile", image: "iphone"),
+    Skill(id: UUID().uuidString, skillName: "API", image: "laptopcomputer"),
+    Skill(id: UUID().uuidString, skillName: "Accessibility", image: "accessibility"),
+    Skill(id: UUID().uuidString, skillName: "Automation", image: "dot.scope.laptopcomputer"),
+    Skill(id: UUID().uuidString, skillName: "Database", image: "square.stack.3d.up.badge.automatic.fill"),
+    Skill(id: UUID().uuidString, skillName: "CI/CD", image: "infinity")
+]
+```
+
+### SF Symbols integration
+
+The `image` property references SF Symbols, Apple's icon system:
+
+<CodeGroup>
+
+```swift Mobile skill
+Skill(id: UUID().uuidString, skillName: "Mobile", image: "iphone")
+```
+
+```swift API skill
+Skill(id: UUID().uuidString, skillName: "API", image: "laptopcomputer")
+```
+
+```swift Automation skill
+Skill(id: UUID().uuidString, skillName: "Automation", image: "dot.scope.laptopcomputer")
+```
+
+</CodeGroup>
+
+## Experience struct
+
+Represents a work experience entry.
+
+### Definition
+
+```swift Code/Models/Portfolio.swift
+struct Experience: Identifiable {
+    var id: String
+    let companyName: String
+    let role: String
+    let duration: String
+}
+```
+
+### Properties
+
+<ParamField path="id" type="String" required>
+  Unique identifier for the experience entry (typically a UUID string)
+</ParamField>
+
+<ParamField path="companyName" type="String" required>
+  Name of the company or organization
+</ParamField>
+
+<ParamField path="role" type="String" required>
+  Job title or position held
+</ParamField>
+
+<ParamField path="duration" type="String" required>
+  Time period in human-readable format (e.g., "July 2024 - Present")
+</ParamField>
+
+### Identifiable conformance
+
+<Info>
+Like `Skill`, the `Experience` struct conforms to `Identifiable` for efficient SwiftUI list rendering.
+</Info>
+
+### Usage example
+
+```swift
+let experiences = [
+    Experience(
+        id: UUID().uuidString,
+        companyName: "INIT Creative",
+        role: "AI Specialist",
+        duration: "July 2024 - Present"
+    ),
+    Experience(
+        id: UUID().uuidString,
+        companyName: "Digivante",
+        role: "Freelance Tester",
+        duration: "Jan 2023 - Present"
+    ),
+    Experience(
+        id: UUID().uuidString,
+        companyName: "Vertex",
+        role: "QA Engineer",
+        duration: "Apr 2022 - Dec 2022"
+    )
+]
+```
+
+## Design decisions
+
+### Immutability
+
+All properties use `let` instead of `var`, making the models immutable:
+
+<Tabs>
+  <Tab title="Benefits">
+    - Thread-safe by default
+    - Prevents accidental mutations
+    - Clearer data flow
+    - Easier to reason about
+  </Tab>
+  <Tab title="Trade-offs">
+    - Cannot modify existing instances
+    - Must create new instances for updates
+    - Not suitable for frequently changing data
+  </Tab>
+</Tabs>
+
+<Note>
+For the current use case (static portfolio display), immutability is appropriate. If the app needs to support editing, consider making properties mutable or implementing a separate mutable model layer.
+</Note>
+
+### String-based identifiers
+
+Both `Skill` and `Experience` use `String` IDs generated from `UUID().uuidString`:
+
+```swift
+id: UUID().uuidString
+```
+
+**Advantages:**
+- Human-readable in debug logs
+- Compatible with JSON serialization
+- Easy to pass between systems
+
+**Alternative approach:**
+
+```swift
+struct Skill: Identifiable {
+    let id = UUID()  // Use UUID type directly
+    let skillName: String
+    let image: String
+}
+```
+
+### Separate vs. nested models
+
+The models are defined as separate top-level structs rather than nested within `Portfolio`:
+
+<CodeGroup>
+
+```swift Current approach
+struct Skill: Identifiable { ... }
+struct Experience: Identifiable { ... }
+struct Portfolio {
+    let skills: [Skill]
+    let experience: [Experience]
+}
+```
+
+```swift Alternative (nested)
+struct Portfolio {
+    struct Skill: Identifiable { ... }
+    struct Experience: Identifiable { ... }
+    
+    let skills: [Skill]
+    let experience: [Experience]
+}
+```
+
+</CodeGroup>
+
+The current approach provides better reusability and cleaner namespacing.
+
+## Future enhancements
+
+<CardGroup cols={2}>
+  <Card title="Codable conformance" icon="code">
+    Add `Codable` protocol to support JSON serialization for API integration
+  </Card>
+  <Card title="Validation logic" icon="shield-check">
+    Add computed properties or methods to validate data (e.g., URL formats)
+  </Card>
+  <Card title="Additional fields" icon="plus">
+    Extend models with more properties (email, phone, certifications, etc.)
+  </Card>
+  <Card title="Date handling" icon="calendar">
+    Use `Date` types for experience duration instead of strings
+  </Card>
+</CardGroup>
+
+## Related documentation
+
+<Card title="App state management" icon="circle-nodes" href="/architecture/app-state">
+  Learn how AppModel uses these data models
+</Card>

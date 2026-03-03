@@ -1,0 +1,151 @@
+---
+title: Introduction
+description: A beautiful SwiftUI iOS application for displaying professional portfolio and resume information with interactive, collapsible sections
+---
+
+<img
+  className="block dark:hidden"
+  src="/images/hero-light.png"
+  alt="OI Resume App Hero Light"
+/>
+<img
+  className="hidden dark:block"
+  src="/images/hero-dark.png"
+  alt="OI Resume App Hero Dark"
+/>
+
+## Welcome to OI Resume App
+
+OI Resume App is a Swift-based iOS application that elegantly showcases your professional skills and experiences. Built entirely with SwiftUI, it provides an interactive and modern way to present your portfolio with smooth animations and collapsible sections.
+
+The app allows users to expand or collapse different sections—such as skills and experiences—through interactive buttons with animated chevrons, creating a clean and engaging user experience.
+
+<CardGroup cols={2}>
+  <Card
+    title="Quick start"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Get up and running with the OI Resume App in minutes
+  </Card>
+  <Card
+    title="Installation"
+    icon="download"
+    href="/installation"
+  >
+    Step-by-step guide to set up your development environment
+  </Card>
+  <Card
+    title="Architecture"
+    icon="sitemap"
+    href="/architecture/overview"
+  >
+    Learn about the app's structure and design patterns
+  </Card>
+  <Card
+    title="Testing"
+    icon="vial"
+    href="/testing/overview"
+  >
+    Explore XCUITest implementation and Page Object Model
+  </Card>
+</CardGroup>
+
+## Key features
+
+<AccordionGroup>
+  <Accordion title="SwiftUI-based architecture">
+    Built entirely with SwiftUI, leveraging the latest iOS development framework for declarative UI design. The app uses modern SwiftUI patterns including `@State`, `@ObservableObject`, and combines views efficiently for optimal performance.
+  </Accordion>
+
+  <Accordion title="Interactive collapsible sections">
+    Skills and experience sections can be expanded or collapsed with smooth animations. The chevron icons rotate 180 degrees with `.easeInOut` animations, providing delightful user feedback.
+  </Accordion>
+
+  <Accordion title="Dark and light mode support">
+    Full support for iOS system appearance modes. The app automatically adapts to the user's preferred color scheme using `Color(UIColor.systemBackground)` and dynamic colors throughout.
+  </Accordion>
+
+  <Accordion title="XCUITest testing framework">
+    Comprehensive UI testing using XCUITest with Page Object Model (POM) pattern for better maintainability. Tests verify section visibility, toggle functionality, and user interactions.
+  </Accordion>
+
+  <Accordion title="Custom typography">
+    Beautiful Montserrat font family integration with multiple weights (thin, regular, medium, semibold, bold) and italic variants for a polished, professional appearance.
+  </Accordion>
+
+  <Accordion title="Modular component architecture">
+    Clean separation of concerns with dedicated views: `HeaderView`, `SkillsView`, `ExperiencesView`, and their supporting components, making the codebase easy to maintain and extend.
+  </Accordion>
+</AccordionGroup>
+
+## Tech stack
+
+<CardGroup cols={3}>
+  <Card title="SwiftUI" icon="swift">
+    Modern declarative UI framework
+  </Card>
+  <Card title="XCUITest" icon="flask-vial">
+    UI testing with Page Object Model
+  </Card>
+  <Card title="Xcode" icon="hammer">
+    iOS development IDE
+  </Card>
+  <Card title="Swift" icon="code">
+    Type-safe programming language
+  </Card>
+  <Card title="iOS 14+" icon="mobile">
+    Target platform
+  </Card>
+  <Card title="Git" icon="git-alt">
+    Version control
+  </Card>
+</CardGroup>
+
+## App structure
+
+The OI Resume App follows a clean, organized structure:
+
+```
+OI_Portfolio/
+├── Code/
+│   ├── Controllers/
+│   │   └── OI_PortfolioApp.swift      # Main app entry point
+│   ├── Models/
+│   │   └── Portfolio.swift            # Data models (Skill, Experience, Portfolio)
+│   ├── Services/
+│   │   └── AppModel.swift             # Portfolio data and business logic
+│   └── Views/
+│       ├── PortfolioView.swift        # Main view
+│       └── SupportViews/
+│           ├── HeaderView.swift       # Profile header
+│           ├── SkillsView.swift       # Skills section with grid
+│           ├── ExperiencesView.swift  # Experience section
+│           ├── SkillView.swift        # Individual skill card
+│           └── ExperienceView.swift   # Individual experience item
+├── Extensions/
+│   └── ColorExtensions.swift          # Hex color support
+└── Utilities/
+    └── FontManager.swift              # Montserrat font management
+```
+
+<Note>
+  The app uses the Page Object Model pattern for UI testing, separating test logic from page interactions for better maintainability and reusability.
+</Note>
+
+## What's next?
+
+<Steps>
+  <Step title="Install requirements">
+    Set up Xcode and configure your development environment
+  </Step>
+  <Step title="Clone and build">
+    Get the source code and build the project
+  </Step>
+  <Step title="Customize your portfolio">
+    Update the `AppModel.swift` file with your personal information
+  </Step>
+  <Step title="Run tests">
+    Execute XCUITests to verify everything works correctly
+  </Step>
+</Steps>
